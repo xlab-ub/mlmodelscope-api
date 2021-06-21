@@ -1,0 +1,13 @@
+FROM golang:1.15-alpine3.13 AS builder
+
+RUN apk add git
+
+WORKDIR /src
+COPY . .
+RUN go get -tags nogpu
+RUN go build -tags nogpu .
+
+FROM alpine:3.13 AS runner
+
+COPY --from=builder /src/api /usr/local/bin/api
+CMD [ "/usr/local/bin/api" ]
