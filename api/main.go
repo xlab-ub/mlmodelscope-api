@@ -1,6 +1,6 @@
 package main
 
-import "predict/cmd"
+import "api/cmd"
 
 func main() {
 	cmd.Execute()

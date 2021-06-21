@@ -15,11 +15,12 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "predict",
+	Use:   "api",
 	Short: "Run the prediction API endpoints",
-	Long: "Run the prediction API endpoints",
-	Run: serve,
+	Long:  "Run the prediction API endpoints",
+	Run:   serve,
 }
+
 const DefaultPort = "80"
 
 func serve(cmd *cobra.Command, args []string) {
@@ -45,7 +46,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(func() {
-		opts := []config.Option {
+		opts := []config.Option{
 			config.AppName("carml"),
 		}
 		config.Init(opts...)
