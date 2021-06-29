@@ -1,7 +1,26 @@
 version: "3.9"
 services:
+  api:
+    build:
+      context: ./api/
+      dockerfile: ../docker/Dockerfile.api
+    environment:
+      - C3SR_REGISTRY_ENDPOINTS=registry:8500
+      - C3SR_REGISTRY_PROVIDER=consul
+      - C3SR_TRACER_ENABLED=true
+      - C3SR_TRACER_PROVIDER=jaeger
+      - C3SR_TRACER_ENDPOINTS=trace:9411
+      - C3SR_TRACER_LEVEL=FULL_TRACE
+    ports:
+      - "8088:80"
+
+  registry:
+    image: consul
+    ports:
+      - "8500:8500"
+
   trace:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.21.0
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     ports:
@@ -13,7 +32,9 @@ services:
       - "14268:14268"
       - "9411:9411"
 
-  registry:
-    image: consul
+  uploader:
+    build:
+      context: ./uploader/
+      dockerfile: ../docker/Dockerfile.uploader
     ports:
-      - "8500:8500"
+      - "8089:80"
