@@ -2,6 +2,15 @@
 
 This repository provides the main parts of the mlmodelscope API
 
+## Deployment
+
+The `DOCKER_REGISTRY` environment variable must be set to build or pull
+the correct image tags for development, staging, or production. The `.env`
+file sets this to `staging-ec2.mlmodelscope.org:5000` by default, which
+is the staging registry. This is safe to use for development as well. For
+production it should be set to `c3sr` so that images will be tagged and
+pulled from the C3SR namespace on Docker Hub.
+
 ## API
 
 The `/api` directory contains an application that provides most of
@@ -9,21 +18,14 @@ the API endpoints for mlmodelscope.
 
 ### Debugging in a container
 
-To debug the API endpoints while they run in a container (this can
-be useful to test behavior when the API is running on a Docker
-network alongside ML agents), you can build a Docker container using
-`docker/Dockerfile.api-debug`.
-
-This Dockerfile creates a container that runs the API app with the
-[Delve](https://github.com/go-delve/delve) debugger attached. Delve
-listens on port 2345, which you should expose to your host machine.
-The API itself will not begin running until a debugging client is
+It is possible to debug the API endpoints while they run in a container
+(this can be useful to test behavior when the API is running on a Docker
+network alongside ML agents.) By default the API service is built from the
+`docker/Dockerfile.api-debug` Dockerfile. This Dockerfile creates a container
+that runs the API app with the [Delve](https://github.com/go-delve/delve) 
+debugger attached. Delve listens on port 2345, which is exposed to the host
+machine. The API itself will not begin running until a debugging client is
 attached to Delve.
-
-The `docker-compose.yml` can be updated to use the debug Dockerfile
-to build the API container by changing the **build** section of the
-**api** service to use the correct Dockerfile, and exposing port 2345
-in the **ports** section.
 
 ## Uploader
 
