@@ -28,8 +28,9 @@ func MakeUploadHandler(uploadPath string, log *logrus.Entry) (http.Handler, erro
 	store.UseIn(composer)
 
 	handler, err := handler.NewHandler(handler.Config{
-		BasePath:      "/",
-		StoreComposer: composer,
+		BasePath:                "/",
+		StoreComposer:           composer,
+		RespectForwardedHeaders: true,
 		Logger: glog.New(
 			log.Writer(),
 			"tusd",

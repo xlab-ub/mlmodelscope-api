@@ -20,9 +20,9 @@ the API endpoints for mlmodelscope.
 
 It is possible to debug the API endpoints while they run in a container
 (this can be useful to test behavior when the API is running on a Docker
-network alongside ML agents.) By default the API service is built from the
-`docker/Dockerfile.api-debug` Dockerfile. This Dockerfile creates a container
-that runs the API app with the [Delve](https://github.com/go-delve/delve) 
+network alongside ML agents.) To enable debugging in the container, run
+the API from the `docker/Dockerfile.api-debug` Dockerfile. This Dockerfile
+creates a container that runs the API app with the [Delve](https://github.com/go-delve/delve) 
 debugger attached. Delve listens on port 2345, which is exposed to the host
 machine. The API itself will not begin running until a debugging client is
 attached to Delve.
