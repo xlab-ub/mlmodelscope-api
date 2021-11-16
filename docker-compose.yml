@@ -1,27 +1,7 @@
-version: "3.9"
+version: "3.8"
 services:
   api:
-    image: "$DOCKER_REGISTRY/mlmodelscope-api:1.0"
-
-    networks:
-      - default
-      - traefik
-
-    deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-api.rule=Host(`staging.api.mlmodelscope.org`)"
-        - "traefik.http.routers.mlmodelscope-api.entrypoints=websecure"
-        - "traefik.http.routers.mlmodelscope-api.tls.certresolver=letsencrypt"
-        - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=80"
-        - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT"
-        - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=https://staging.mlmodelscope.org,http://localhost:3000"
-        - "traefik.http.middlewares.add-cors.headers.accessControlAllowCredentials=true"
-        - "traefik.http.middlewares.add-cors.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id"
-        - "traefik.http.middlewares.add-cors.headers.accesscontrolmaxage=100"
-        - "traefik.http.middlewares.add-cors.headers.addvaryheader=true"
-        - "traefik.http.routers.mlmodelscope-api.middlewares=add-cors"
+    image: "$DOCKER_REGISTRY/mlmodelscope-api:$API_VERSION"
 
     environment:
       - C3SR_REGISTRY_ENDPOINTS=registry:8500
@@ -53,31 +33,6 @@ services:
       - "9411:9411"
 
   uploader:
-    image: "$DOCKER_REGISTRY/mlmodelscope-uploader:1.0"
-    networks:
-      - default
-      - traefik
-
-    deploy:
-      labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-uploader.rule=Host(`staging.uploader.mlmodelscope.org`)"
-        - "traefik.http.routers.mlmodelscope-uploader.entrypoints=websecure"
-        - "traefik.http.routers.mlmodelscope-uploader.tls.certresolver=letsencrypt"
-        - "traefik.http.services.mlmodelscope-uploader.loadbalancer.server.port=80"
-        - "traefik.http.middlewares.add-cors-uploader.headers.accessControlAllowMethods=GET,OPTIONS,PUT,PATCH"
-        - "traefik.http.middlewares.add-cors-uploader.headers.accesscontrolalloworiginlist=https://staging.mlmodelscope.org"
-        - "traefik.http.middlewares.add-cors-uploader.headers.accessControlAllowCredentials=true"
-        - "traefik.http.middlewares.add-cors-uploader.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id,tus-resumable,upload-length,upload-metadata,upload-offset"
-        - "traefik.http.middlewares.add-cors-uploader.headers.accesscontrolmaxage=100"
-        - "traefik.http.middlewares.add-cors-uploader.headers.addvaryheader=true"
-        - "traefik.http.routers.mlmodelscope-uploader.middlewares=add-cors-uploader"
-
+    image: "$DOCKER_REGISTRY/mlmodelscope-uploader:$UPLOADER_VERSION"
     ports:
       - "8089:80"
-
-networks:
-  traefik:
-    external:
-      name: traefik
