@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   api:
-    image: "$DOCKER_REGISTRY/mlmodelscope-api:1.0"
+    image: "$DOCKER_REGISTRY/mlmodelscope-api:$API_VERSION"
 
     environment:
       - C3SR_REGISTRY_ENDPOINTS=registry:8500
@@ -33,6 +33,6 @@ services:
       - "9411:9411"
 
   uploader:
-    image: "$DOCKER_REGISTRY/mlmodelscope-uploader:1.0"
+    image: "$DOCKER_REGISTRY/mlmodelscope-uploader:$UPLOADER_VERSION"
     ports:
       - "8089:80"
