@@ -6,10 +6,9 @@ This repository provides the main parts of the mlmodelscope API
 
 The `DOCKER_REGISTRY` environment variable must be set to build or pull
 the correct image tags for development, staging, or production. The `.env`
-file sets this to `staging-ec2.mlmodelscope.org:5000` by default, which
-is the staging registry. This is safe to use for development as well. For
-production it should be set to `c3sr` so that images will be tagged and
-pulled from the C3SR namespace on Docker Hub.
+file sets this to `c3sr` by default so that images will be tagged and
+pulled from the C3SR namespace on Docker Hub. Change this if you want to
+use a private registry to host your own modified images.
 
 ## API
 
