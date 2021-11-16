@@ -37,6 +37,6 @@ if [ ! -f "$DOCKERFILE" ]; then
 fi
 
 docker build -t "$REGISTRY/mlmodelscope-$TARGET:$VERSION" --file "$DOCKERFILE" "$TARGET_DIR"
-docker tag "$REGISTRY/mlmodelscope-$TARGET:$VERSION" "$REGISTRY/$TARGET:latest"
+docker tag "$REGISTRY/mlmodelscope-$TARGET:$VERSION" "$REGISTRY/mlmodelscope-$TARGET:latest"
 
 cleanup_and_exit
