@@ -18,6 +18,7 @@ services:
     image: consul
     ports:
       - "8500:8500"
+      - "8600:8600"
 
   trace:
     image: jaegertracing/all-in-one:1.21.0
