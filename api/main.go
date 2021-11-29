@@ -1,7 +1,12 @@
 package main
 
-import "api/cmd"
+import (
+	"api/endpoints"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	cmd.Execute()
+	r := gin.Default()
+	r.GET("/", endpoints.Version)
+	r.Run()
 }
