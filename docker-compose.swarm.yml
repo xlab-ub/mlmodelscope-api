@@ -42,6 +42,18 @@ services:
         - "traefik.http.middlewares.add-cors-uploader.headers.addvaryheader=true"
         - "traefik.http.routers.mlmodelscope-uploader.middlewares=add-cors-uploader"
 
+  mq:
+    networks:
+      - default
+      - traefik
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik"
+        - "traefik.http.routers.mlmodelscope-uploader.rule=Host(`${ENVIRONMENT}mq.mlmodelscope.org`)"
+        - "traefik.http.routers.mlmodelscope-uploader.entrypoints=websecure"
+        - "traefik.http.routers.mlmodelscope-uploader.tls.certresolver=letsencrypt"
+        - "traefik.http.services.mlmodelscope-uploader.loadbalancer.server.port=15672"
 
 networks:
   traefik:

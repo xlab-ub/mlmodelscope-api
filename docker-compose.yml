@@ -14,12 +14,6 @@ services:
     ports:
       - "8088:80"
 
-  registry:
-    image: consul
-    ports:
-      - "8500:8500"
-      - "8600:8600"
-
   trace:
     image: jaegertracing/all-in-one:1.21.0
     environment:
@@ -37,3 +31,12 @@ services:
     image: "$DOCKER_REGISTRY/mlmodelscope-uploader:$UPLOADER_VERSION"
     ports:
       - "8089:80"
+
+  mq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "$MQ_USER"
+      RABBITMQ_DEFAULT_PASS: "$MQ_PASSWORD"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
