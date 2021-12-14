@@ -48,3 +48,6 @@ func SetMessageQueue(queue interfaces.MessageQueue) {
 	messageQueue = queue
 }
 
+func GetMessageQueue() interfaces.MessageQueue {
+	return messageQueue
+}
