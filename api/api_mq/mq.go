@@ -36,7 +36,6 @@ func ConnectToMq() {
 	select {
 	case isReady := <-ready:
 		if isReady {
-			defer messageQueue.Shutdown()
 			log.Printf("[INFO] Connected to message queue")
 		} else {
 			log.Fatalf("[FATAL] Could not connect to message queue server")

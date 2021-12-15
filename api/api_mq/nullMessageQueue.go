@@ -2,7 +2,7 @@ package api_mq
 
 import "github.com/c3sr/mq/interfaces"
 
-type nullMessageQueue struct {}
+type nullMessageQueue struct{}
 
 func (n *nullMessageQueue) Acknowledge(message interfaces.Message) error {
 	return nil
@@ -27,8 +27,12 @@ func NullMessageQueue() interfaces.MessageQueue {
 	return &nullMessageQueue{}
 }
 
-type nullChannel struct {}
+type nullChannel struct{}
 
 func (n *nullChannel) SendMessage(message string) (string, error) {
 	return "", nil
+}
+
+func (n *nullChannel) SendResponse(message string, correlationId string) error {
+	panic("implement me")
 }
