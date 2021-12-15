@@ -10,9 +10,16 @@ services:
       - C3SR_TRACER_PROVIDER=jaeger
       - C3SR_TRACER_ENDPOINTS=trace:9411
       - C3SR_TRACER_LEVEL=FULL_TRACE
+      - MQ_HOST=$MQ_HOST
+      - MQ_PORT=$MQ_PORT
+      - MQ_USER=$MQ_USER
+      - MQ_PASSWORD=$MQ_PASSWORD
 
     ports:
-      - "8088:80"
+      - "8080:8080"
+
+    depends_on:
+      - mq
 
   trace:
     image: jaegertracing/all-in-one:1.21.0
