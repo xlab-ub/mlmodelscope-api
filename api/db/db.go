@@ -1,6 +1,7 @@
 package db
 
 import (
+	"api/db/models"
 	"errors"
 	"fmt"
 	"gorm.io/driver/sqlite"
@@ -20,11 +21,46 @@ func (e *ConfigurationError) Error() string {
 var (
 	host      string
 	driver    string
-	database  gorm.DB
 	dialector gorm.Dialector
 )
 
-func OpenDb() (db *gorm.DB, err error) {
+type Db interface {
+	CreateFramework(*models.Framework) error
+	CreateModel(*models.Model) error
+	GetAllFrameworks() ([]models.Framework, error)
+	GetAllModels() ([]models.Model, error)
+	Migrate() error
+}
+
+type db struct {
+	database *gorm.DB
+}
+
+func (d *db) CreateFramework(f *models.Framework) (err error) {
+	d.database.Create(f)
+
+	return
+}
+
+func (d *db) CreateModel(m *models.Model) (err error) {
+	d.database.Create(m)
+
+	return
+}
+
+func (d *db) GetAllFrameworks() (frameworks []models.Framework, err error) {
+	d.database.Find(&frameworks)
+
+	return
+}
+
+func (d *db) GetAllModels() (models []models.Model, err error) {
+	d.database.Find(&models)
+
+	return
+}
+
+func OpenDb() (result Db, err error) {
 	err = readConfiguration()
 	if err != nil {
 		return
@@ -35,7 +71,11 @@ func OpenDb() (db *gorm.DB, err error) {
 		return
 	}
 
-	return gorm.Open(dialector)
+	database, err := gorm.Open(dialector)
+	result = &db{
+		database: database,
+	}
+	return
 }
 
 func readConfiguration() (err error) {

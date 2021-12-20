@@ -2,11 +2,12 @@ package db
 
 import (
 	"api/db/models"
-	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
+
+var testDb Db
 
 func TestSetupDbReturnsErrorForMissingSqliteConfiguration(t *testing.T) {
 	os.Setenv("DB_HOST", "test.db")
@@ -38,52 +39,57 @@ func TestOpenDbReturnsErrorForUnsupportedDatabaseType(t *testing.T) {
 	assert.Equal(t, "unsupported database: bad_db", configError.Err.Error())
 }
 
-//func TestOpenDbReturnsADatabase(t *testing.T) {
-//	os.Setenv("DB_DRIVER", "sqlite")
-//	os.Setenv("DB_HOST", "test.sqlite")
-//
-//	db, err := OpenDb()
-//	Migrate(db)
-//
-//	assert.Nil(t, err)
-//}
+func TestQueryEmptyDb(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	models, _ := testDb.GetAllModels()
 
-func TestMarshalModelToJson(t *testing.T) {
-	m := &models.Model{
-		Attributes: models.ModelAttributes{
-			Top1:            "54.92",
-			Top5:            "78.03",
-			Kind:            "CNN",
-			ManifestAuthor:  "Cheng Li",
-			TrainingDataset: "ImageNet",
-		},
-		Description: "MXNet Image Classification model, which is trained on the ImageNet dataset. Use AlexNet from GluonCV model zoo.",
-		Details: models.ModelDetails{
-			GraphChecksum:   "4abd57ec8863ff3e3e29ecd4ead43d1f",
-			GraphPath:       "model-symbol.json",
-			WeightsChecksum: "906234b2a6b14bedac2dcccba8178529",
-			WeightsPath:     "model-0000.params",
-		},
-		Framework: models.Framework{
-			Name:    "MXNet",
-			Version: "1.7.0",
-		},
-		FrameworkID: 0,
-		Input: models.ModelOutput{
-			Description: "the input image",
-			Type:        "image",
-		},
-		License: "unrestricted",
-		Name:    "AlexNet",
-		Output: models.ModelOutput{
-			Description: "the output label",
-			Type:        "classification",
-		},
-		Version: "1.0",
-	}
+	assert.Equal(t, 0, len(models))
+}
 
-	j, err := json.Marshal(m)
+func TestCreateAndQueryModels(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
 
-	assert.Nil(t, err)
-	println(string(j))
+	createModelNamed("test1")
+	createModelNamed("test2")
+
+	models, _ := testDb.GetAllModels()
+
+	assert.Equal(t, 2, len(models))
+	assert.Equal(t, "test1", models[0].Name)
+	assert.Equal(t, "test2", models[1].Name)
+}
+
+func createModelNamed(name string) {
+	testDb.CreateModel(&models.Model{Name: name})
+}
+
+func TestCreateAndQueryFrameworks(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFrameworkNamed("fw1")
+	createFrameworkNamed("fw2")
+
+	frameworks, _ := testDb.GetAllFrameworks()
+
+	assert.Equal(t, 2, len(frameworks))
+	assert.Equal(t, "fw1", frameworks[0].Name)
+	assert.Equal(t, "fw2", frameworks[1].Name)
+}
+
+func createFrameworkNamed(name string) {
+	testDb.CreateFramework(&models.Framework{Name: name})
+}
+
+func cleanupTestDatabase() {
+	os.Remove("test.sqlite")
+}
+
+func CreateTestDatabase() {
+	os.Setenv("DB_DRIVER", "sqlite")
+	os.Setenv("DB_HOST", "test.sqlite")
+
+	testDb, _ = OpenDb()
+	testDb.Migrate()
 }
