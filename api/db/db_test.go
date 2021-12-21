@@ -92,6 +92,28 @@ func TestQueryModelsByFrameworkId(t *testing.T) {
 	assert.Equal(t, "fw1", result[0].Framework.Name)
 }
 
+func TestQueryModelsByTask(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createModelNamed("model1")
+	testDb.CreateModel(&models.Model{Name: "model2", Output: models.ModelOutput{Type: "classification"}})
+
+	result, _ := testDb.GetModelsByTask("classification")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "model2", result[0].Name)
+}
+
+func TestQueryModelsByUnknownTask(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createModelNamed("model1")
+
+	result, _ := testDb.GetModelsByTask("classification")
+
+	assert.Equal(t, 0, len(result))
+}
+
 func createFrameworkNamed(name string) {
 	testDb.CreateFramework(&models.Framework{Name: name})
 }

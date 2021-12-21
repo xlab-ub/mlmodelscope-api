@@ -29,6 +29,7 @@ type Db interface {
 	CreateModel(*models.Model) error
 	GetAllFrameworks() ([]models.Framework, error)
 	GetAllModels() ([]models.Model, error)
+	GetModelsByTask(string) ([]models.Model, error)
 	GetModelsForFramework(int) ([]models.Model, error)
 	Migrate() error
 }
@@ -57,6 +58,12 @@ func (d *db) GetAllFrameworks() (frameworks []models.Framework, err error) {
 
 func (d *db) GetAllModels() (m []models.Model, err error) {
 	d.database.Joins("Framework").Find(&m)
+
+	return
+}
+
+func (d *db) GetModelsByTask(task string) (m []models.Model, err error) {
+	d.database.Where(&models.Model{Output: models.ModelOutput{Type: task}}).Joins("Framework").Find(&m)
 
 	return
 }
