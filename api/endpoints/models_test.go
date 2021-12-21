@@ -34,8 +34,10 @@ func TestModelRoutes(t *testing.T) {
 		_ = json.Unmarshal(w.Body.Bytes(), &result)
 
 		assert.Equal(t, "model1", result.Models[0].Name)
+		assert.Equal(t, uint(1), result.Models[0].ID)
 		assert.Equal(t, "fw1", result.Models[0].Framework.Name)
 		assert.Equal(t, "model2", result.Models[1].Name)
+		assert.Equal(t, uint(2), result.Models[1].ID)
 		assert.Equal(t, "fw2", result.Models[1].Framework.Name)
 	})
 }

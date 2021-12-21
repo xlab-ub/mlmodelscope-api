@@ -1,9 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
 type Framework struct {
-	gorm.Model `json:"-"`
-	Name       string `json:"name"`
-	Version    string `json:"version"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	Name      string    `json:"name"`
+	Version   string    `json:"version"`
 }

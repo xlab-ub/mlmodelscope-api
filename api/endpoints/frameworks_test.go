@@ -34,6 +34,8 @@ func TestFrameworkRoutes(t *testing.T) {
 		_ = json.Unmarshal(w.Body.Bytes(), &result)
 
 		assert.Equal(t, "fw1", result.Frameworks[0].Name)
+		assert.Equal(t, uint(1), result.Frameworks[0].ID)
 		assert.Equal(t, "fw2", result.Frameworks[1].Name)
+		assert.Equal(t, uint(2), result.Frameworks[1].ID)
 	})
 }

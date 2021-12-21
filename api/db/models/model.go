@@ -1,11 +1,13 @@
 package models
 
 import (
-	"gorm.io/gorm"
+	"time"
 )
 
 type Model struct {
-	gorm.Model  `json:"-"`
+	ID          uint            `gorm:"primaryKey" json:"id"`
+	CreatedAt   time.Time       `json:"-"`
+	UpdatedAt   time.Time       `json:"-"`
 	Attributes  ModelAttributes `gorm:"embedded;embeddedPrefix:attribute_" json:"attributes"`
 	Description string          `json:"description"`
 	Details     ModelDetails    `gorm:"embedded;embeddedPrefix:detail_" json:"model"`
