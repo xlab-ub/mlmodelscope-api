@@ -54,8 +54,8 @@ func (d *db) GetAllFrameworks() (frameworks []models.Framework, err error) {
 	return
 }
 
-func (d *db) GetAllModels() (models []models.Model, err error) {
-	d.database.Find(&models)
+func (d *db) GetAllModels() (m []models.Model, err error) {
+	d.database.Joins("Framework").Find(&m)
 
 	return
 }
