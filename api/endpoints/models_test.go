@@ -1,18 +1,13 @@
 package endpoints
 
 import (
-	"api/api_db"
-	"api/db"
 	"api/db/models"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
-
-var testDb db.Db
 
 func TestModelRoutes(t *testing.T) {
 	openDatabase()
@@ -43,16 +38,4 @@ func TestModelRoutes(t *testing.T) {
 		assert.Equal(t, "model2", result.Models[1].Name)
 		assert.Equal(t, "fw2", result.Models[1].Framework.Name)
 	})
-}
-
-func openDatabase() {
-	os.Setenv("DB_DRIVER", "sqlite")
-	os.Setenv("DB_HOST", "models_test.sqlite")
-	testDb, _ = api_db.GetDatabase()
-	testDb.Migrate()
-}
-
-func cleanupTestDatabase() {
-	api_db.CloseDatabase()
-	os.Remove("models_test.sqlite")
 }
