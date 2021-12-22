@@ -11,7 +11,7 @@ type Model struct {
 	Attributes  ModelAttributes `gorm:"embedded;embeddedPrefix:attribute_" json:"attributes"`
 	Description string          `json:"description"`
 	Details     ModelDetails    `gorm:"embedded;embeddedPrefix:detail_" json:"model"`
-	Framework   Framework       `json:"framework"`
+	Framework   *Framework      `json:"framework"`
 	FrameworkID int             `json:"-"`
 	Input       ModelOutput     `gorm:"embedded;embeddedPrefix:input_" json:"input"`
 	License     string          `json:"license"`

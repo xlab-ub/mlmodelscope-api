@@ -24,8 +24,8 @@ func TestModelRoutes(t *testing.T) {
 	})
 
 	t.Run("ListNotEmpty", func(t *testing.T) {
-		testDb.CreateModel(&models.Model{Name: "model1", Framework: models.Framework{Name: "fw1"}, Output: models.ModelOutput{Type: "test"}})
-		testDb.CreateModel(&models.Model{Name: "model2", Framework: models.Framework{Name: "fw2"}})
+		testDb.CreateModel(&models.Model{Name: "model1", Framework: &models.Framework{Name: "fw1"}, Output: models.ModelOutput{Type: "test"}})
+		testDb.CreateModel(&models.Model{Name: "model2", Framework: &models.Framework{Name: "fw2"}})
 
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)

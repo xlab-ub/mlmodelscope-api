@@ -114,6 +114,17 @@ func TestQueryModelsByUnknownTask(t *testing.T) {
 	assert.Equal(t, 0, len(result))
 }
 
+func TestQueryFrameworksByNameAndVersion(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFrameworkNamed("Pytorch")
+	testDb.CreateFramework(&models.Framework{Name: "Pytorch", Version: "1.0"})
+
+	result, _ := testDb.QueryFrameworks(&models.Framework{Name: "Pytorch", Version: "1.0"})
+
+	assert.Equal(t, uint(2), result.ID)
+}
+
 func createFrameworkNamed(name string) {
 	testDb.CreateFramework(&models.Framework{Name: name})
 }

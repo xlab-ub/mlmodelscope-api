@@ -32,6 +32,7 @@ type Db interface {
 	GetModelsByTask(string) ([]models.Model, error)
 	GetModelsForFramework(int) ([]models.Model, error)
 	Migrate() error
+	QueryFrameworks(*models.Framework) (*models.Framework, error)
 }
 
 type db struct {
@@ -72,6 +73,17 @@ func (d *db) GetModelsForFramework(frameworkId int) (m []models.Model, err error
 	d.database.Where(&models.Model{FrameworkID: frameworkId}).Joins("Framework").Find(&m)
 
 	return
+}
+
+func (d *db) QueryFrameworks(query *models.Framework) (*models.Framework, error) {
+	var framework models.Framework
+	r := d.database.Where(query).First(&framework)
+
+	if r.Error != nil {
+		return nil, nil
+	}
+
+	return &framework, nil
 }
 
 func OpenDb() (result Db, err error) {
