@@ -4,6 +4,7 @@ import (
 	"api/db/models"
 	"errors"
 	"fmt"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"os"
@@ -19,9 +20,13 @@ func (e *ConfigurationError) Error() string {
 }
 
 var (
-	host      string
+	dbName    string
 	driver    string
 	dialector gorm.Dialector
+	host      string
+	password  string
+	port      string
+	user      string
 )
 
 type Db interface {
@@ -111,6 +116,7 @@ func readConfiguration() (err error) {
 			Field: "DB_DRIVER",
 			Err:   errors.New("missing configuration environment variable"),
 		}
+		return
 	}
 
 	host = os.Getenv("DB_HOST")
@@ -119,6 +125,51 @@ func readConfiguration() (err error) {
 			Field: "DB_HOST",
 			Err:   errors.New("missing configuration environment variable"),
 		}
+		return
+	}
+
+	if driver == "postgres" {
+		return readServerConfiguration()
+	}
+
+	return
+}
+
+func readServerConfiguration() (err error) {
+	dbName = os.Getenv("DB_DBNAME")
+	if dbName == "" {
+		err = &ConfigurationError{
+			Field: "DB_DBNAME",
+			Err:   errors.New("missing configuration environment variable"),
+		}
+		return
+	}
+
+	password = os.Getenv("DB_PASSWORD")
+	if password == "" {
+		err = &ConfigurationError{
+			Field: "DB_PASSWORD",
+			Err:   errors.New("missing configuration environment variable"),
+		}
+		return
+	}
+
+	port = os.Getenv("DB_PORT")
+	if port == "" {
+		err = &ConfigurationError{
+			Field: "DB_PORT",
+			Err:   errors.New("missing configuration environment variable"),
+		}
+		return
+	}
+
+	user = os.Getenv("DB_USER")
+	if user == "" {
+		err = &ConfigurationError{
+			Field: "DB_USER",
+			Err:   errors.New("missing configuration environment variable"),
+		}
+		return
 	}
 
 	return
@@ -128,6 +179,9 @@ func getDriver() (d gorm.Dialector, err error) {
 	switch driver {
 	case "sqlite":
 		d = sqlite.Open(host)
+	case "postgres":
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbName, port)
+		d = postgres.Open(dsn)
 	default:
 		err = &ConfigurationError{
 			Field: "DB_DRIVER",

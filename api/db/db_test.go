@@ -1,7 +1,10 @@
+// +build !integration
+
 package db
 
 import (
 	"api/db/models"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -26,6 +29,35 @@ func TestSetupDbReturnsErrorForMissingSqliteConfiguration(t *testing.T) {
 	assert.True(t, ok, "OpenDb() should return a ConfigurationError")
 	assert.Equal(t, "DB_HOST", configError.Field)
 	assert.Equal(t, "missing configuration environment variable", configError.Err.Error())
+}
+
+func TestOpenDbReturnsErrorForMissingPostgresConfiguration(t *testing.T) {
+	for _, missing := range []string{
+		"DB_HOST",
+		"DB_PORT",
+		"DB_USER",
+		"DB_PASSWORD",
+		"DB_DBNAME",
+	} {
+		t.Run(fmt.Sprintf("Missing_%s", missing), func(t *testing.T) {
+			setPostgresEnvVars()
+			os.Setenv(missing, "")
+
+			_, err := OpenDb()
+			configError, ok := err.(*ConfigurationError)
+			assert.True(t, ok, "OpenDb() should return a ConfigurationError")
+			assert.Equal(t, missing, configError.Field)
+		})
+	}
+}
+
+func setPostgresEnvVars() {
+	os.Setenv("DB_DRIVER", "postgres")
+	os.Setenv("DB_HOST", "localhost")
+	os.Setenv("DB_PORT", "1234")
+	os.Setenv("DB_USER", "user")
+	os.Setenv("DB_PASSWORD", "password")
+	os.Setenv("DB_DBNAME", "database")
 }
 
 func TestOpenDbReturnsErrorForUnsupportedDatabaseType(t *testing.T) {
