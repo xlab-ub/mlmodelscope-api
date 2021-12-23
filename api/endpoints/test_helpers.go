@@ -1,11 +1,28 @@
 package endpoints
 
 import (
+	"api/api_db"
+	"api/db"
 	"bytes"
 	"encoding/json"
 	"github.com/c3sr/mq/interfaces"
 	"net/http"
+	"os"
 )
+
+var testDb db.Db
+
+func openDatabase() {
+	os.Setenv("DB_DRIVER", "sqlite")
+	os.Setenv("DB_HOST", "models_test.sqlite")
+	testDb, _ = api_db.GetDatabase()
+	testDb.Migrate()
+}
+
+func cleanupTestDatabase() {
+	api_db.CloseDatabase()
+	os.Remove("models_test.sqlite")
+}
 
 type nullWriter struct{}
 

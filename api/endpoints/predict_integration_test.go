@@ -5,9 +5,7 @@ package endpoints
 import (
 	"api/api_mq"
 	"encoding/json"
-	"github.com/c3sr/mq"
 	"github.com/c3sr/mq/interfaces"
-	"github.com/c3sr/mq/rabbit"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http/httptest"
@@ -19,8 +17,6 @@ import (
 var messageQueue interfaces.MessageQueue
 
 func setupForIntegrationTest() {
-	dialer, _ := rabbit.NewRabbitDialer()
-	mq.SetDialer(dialer)
 	go api_mq.ConnectToMq()
 
 	time.Sleep(time.Millisecond * 100)

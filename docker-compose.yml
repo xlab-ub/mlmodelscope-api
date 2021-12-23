@@ -4,12 +4,12 @@ services:
     image: "$DOCKER_REGISTRY/mlmodelscope-api:$API_VERSION"
 
     environment:
-      - C3SR_REGISTRY_ENDPOINTS=registry:8500
-      - C3SR_REGISTRY_PROVIDER=consul
-      - C3SR_TRACER_ENABLED=true
-      - C3SR_TRACER_PROVIDER=jaeger
-      - C3SR_TRACER_ENDPOINTS=trace:9411
-      - C3SR_TRACER_LEVEL=FULL_TRACE
+      - DB_DBNAME=$DB_DBNAME
+      - DB_DRIVER=$DB_DRIVER
+      - DB_HOST=$DB_HOST
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_HOST=$DB_HOST
       - MQ_HOST=$MQ_HOST
       - MQ_PORT=$MQ_PORT
       - MQ_USER=$MQ_USER
