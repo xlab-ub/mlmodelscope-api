@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var testDb db.Db
+var testDb *db.Db
 
 func openDatabase() {
 	os.Setenv("DB_DRIVER", "sqlite")

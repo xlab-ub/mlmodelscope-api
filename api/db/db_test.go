@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-var testDb Db
+var testDb *Db
 
 func TestSetupDbReturnsErrorForMissingSqliteConfiguration(t *testing.T) {
 	os.Setenv("DB_HOST", "test.db")
@@ -19,7 +19,7 @@ func TestSetupDbReturnsErrorForMissingSqliteConfiguration(t *testing.T) {
 	configError, ok := err.(*ConfigurationError)
 	assert.True(t, ok, "OpenDb() should return a ConfigurationError")
 	assert.Equal(t, "DB_DRIVER", configError.Field)
-	assert.Equal(t, "missing configuration environment variable", configError.Err.Error())
+	assert.Equal(t, "missing configuration environment variable: DB_DRIVER", configError.Error())
 
 	os.Clearenv()
 	os.Setenv("DB_DRIVER", "sqlite")
@@ -28,7 +28,7 @@ func TestSetupDbReturnsErrorForMissingSqliteConfiguration(t *testing.T) {
 	configError, ok = err.(*ConfigurationError)
 	assert.True(t, ok, "OpenDb() should return a ConfigurationError")
 	assert.Equal(t, "DB_HOST", configError.Field)
-	assert.Equal(t, "missing configuration environment variable", configError.Err.Error())
+	assert.Equal(t, "missing configuration environment variable: DB_HOST", configError.Error())
 }
 
 func TestOpenDbReturnsErrorForMissingPostgresConfiguration(t *testing.T) {

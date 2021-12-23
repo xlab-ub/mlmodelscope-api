@@ -1,7 +1,6 @@
 package db
 
 import (
-	"api/db/models"
 	"errors"
 	"fmt"
 	"gorm.io/driver/postgres"
@@ -29,69 +28,15 @@ var (
 	user      string
 )
 
-type Db interface {
-	CreateFramework(*models.Framework) error
-	CreateModel(*models.Model) error
-	GetAllFrameworks() ([]models.Framework, error)
-	GetAllModels() ([]models.Model, error)
-	GetModelsByTask(string) ([]models.Model, error)
-	GetModelsForFramework(int) ([]models.Model, error)
-	Migrate() error
-	QueryFrameworks(*models.Framework) (*models.Framework, error)
-}
+type Db struct {
+	FrameworkInteractor
+	ModelInteractor
+	Migrator
 
-type db struct {
 	database *gorm.DB
 }
 
-func (d *db) CreateFramework(f *models.Framework) (err error) {
-	d.database.Create(f)
-
-	return
-}
-
-func (d *db) CreateModel(m *models.Model) (err error) {
-	d.database.Create(m)
-
-	return
-}
-
-func (d *db) GetAllFrameworks() (frameworks []models.Framework, err error) {
-	d.database.Find(&frameworks)
-
-	return
-}
-
-func (d *db) GetAllModels() (m []models.Model, err error) {
-	d.database.Joins("Framework").Find(&m)
-
-	return
-}
-
-func (d *db) GetModelsByTask(task string) (m []models.Model, err error) {
-	d.database.Where(&models.Model{Output: models.ModelOutput{Type: task}}).Joins("Framework").Find(&m)
-
-	return
-}
-
-func (d *db) GetModelsForFramework(frameworkId int) (m []models.Model, err error) {
-	d.database.Where(&models.Model{FrameworkID: frameworkId}).Joins("Framework").Find(&m)
-
-	return
-}
-
-func (d *db) QueryFrameworks(query *models.Framework) (*models.Framework, error) {
-	var framework models.Framework
-	r := d.database.Where(query).First(&framework)
-
-	if r.Error != nil {
-		return nil, nil
-	}
-
-	return &framework, nil
-}
-
-func OpenDb() (result Db, err error) {
+func OpenDb() (result *Db, err error) {
 	err = readConfiguration()
 	if err != nil {
 		return
@@ -103,28 +48,18 @@ func OpenDb() (result Db, err error) {
 	}
 
 	database, err := gorm.Open(dialector)
-	result = &db{
+	result = &Db{
 		database: database,
 	}
 	return
 }
 
 func readConfiguration() (err error) {
-	driver = os.Getenv("DB_DRIVER")
-	if driver == "" {
-		err = &ConfigurationError{
-			Field: "DB_DRIVER",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if driver, err = readConfigurationVariable("DB_DRIVER"); err != nil {
 		return
 	}
 
-	host = os.Getenv("DB_HOST")
-	if host == "" {
-		err = &ConfigurationError{
-			Field: "DB_HOST",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if host, err = readConfigurationVariable("DB_HOST"); err != nil {
 		return
 	}
 
@@ -136,42 +71,33 @@ func readConfiguration() (err error) {
 }
 
 func readServerConfiguration() (err error) {
-	dbName = os.Getenv("DB_DBNAME")
-	if dbName == "" {
-		err = &ConfigurationError{
-			Field: "DB_DBNAME",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if dbName, err = readConfigurationVariable("DB_DBNAME"); err != nil {
 		return
 	}
 
-	password = os.Getenv("DB_PASSWORD")
-	if password == "" {
-		err = &ConfigurationError{
-			Field: "DB_PASSWORD",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if password, err = readConfigurationVariable("DB_PASSWORD"); err != nil {
 		return
 	}
 
-	port = os.Getenv("DB_PORT")
-	if port == "" {
-		err = &ConfigurationError{
-			Field: "DB_PORT",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if port, err = readConfigurationVariable("DB_PORT"); err != nil {
 		return
 	}
 
-	user = os.Getenv("DB_USER")
-	if user == "" {
-		err = &ConfigurationError{
-			Field: "DB_USER",
-			Err:   errors.New("missing configuration environment variable"),
-		}
+	if user, err = readConfigurationVariable("DB_USER"); err != nil {
 		return
 	}
 
+	return
+}
+
+func readConfigurationVariable(name string) (variable string, err error) {
+	variable = os.Getenv(name)
+	if variable == "" {
+		err = &ConfigurationError{
+			Field: name,
+			Err:   errors.New("missing configuration environment variable"),
+		}
+	}
 	return
 }
 

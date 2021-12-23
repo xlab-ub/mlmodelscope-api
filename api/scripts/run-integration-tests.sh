@@ -14,7 +14,7 @@ export MQ_PORT=5672
 export MQ_USER=user
 export MQ_PASSWORD=password
 
-echo "Starting PostgreSQL container"
+echo "Starting PostgreSQL container..."
 docker run \
     -d \
     --rm \

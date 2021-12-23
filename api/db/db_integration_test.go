@@ -10,7 +10,7 @@ import (
 
 func TestDatabase(t *testing.T) {
 	var (
-		d   Db
+		d   *Db
 		err error
 	)
 

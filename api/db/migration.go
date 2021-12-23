@@ -4,7 +4,11 @@ import (
 	"api/db/models"
 )
 
-func (d *db) Migrate() (err error) {
+type Migrator interface {
+	Migrate() error
+}
+
+func (d *Db) Migrate() (err error) {
 	err = d.database.AutoMigrate(&models.Model{})
 	if err != nil {
 		return
