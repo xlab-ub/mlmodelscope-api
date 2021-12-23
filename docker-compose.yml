@@ -4,21 +4,22 @@ services:
     image: "$DOCKER_REGISTRY/mlmodelscope-api:$API_VERSION"
 
     environment:
-      - C3SR_REGISTRY_ENDPOINTS=registry:8500
-      - C3SR_REGISTRY_PROVIDER=consul
-      - C3SR_TRACER_ENABLED=true
-      - C3SR_TRACER_PROVIDER=jaeger
-      - C3SR_TRACER_ENDPOINTS=trace:9411
-      - C3SR_TRACER_LEVEL=FULL_TRACE
+      - DB_DBNAME=$DB_DBNAME
+      - DB_DRIVER=$DB_DRIVER
+      - DB_HOST=$DB_HOST
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_HOST=$DB_HOST
+      - MQ_HOST=$MQ_HOST
+      - MQ_PORT=$MQ_PORT
+      - MQ_USER=$MQ_USER
+      - MQ_PASSWORD=$MQ_PASSWORD
 
     ports:
-      - "8088:80"
+      - "8080:8080"
 
-  registry:
-    image: consul
-    ports:
-      - "8500:8500"
-      - "8600:8600"
+    depends_on:
+      - mq
 
   trace:
     image: jaegertracing/all-in-one:1.21.0
@@ -37,3 +38,12 @@ services:
     image: "$DOCKER_REGISTRY/mlmodelscope-uploader:$UPLOADER_VERSION"
     ports:
       - "8089:80"
+
+  mq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "$MQ_USER"
+      RABBITMQ_DEFAULT_PASS: "$MQ_PASSWORD"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
