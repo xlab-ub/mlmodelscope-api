@@ -1,6 +1,8 @@
 FROM golang:1.15-alpine3.13 AS builder
 
-RUN apk add git
+RUN apk add gcc && \
+    apk add musl-dev && \
+    apk add git
 
 WORKDIR /src
 COPY . .
