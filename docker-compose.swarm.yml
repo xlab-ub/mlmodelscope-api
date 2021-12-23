@@ -50,10 +50,10 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-uploader.rule=Host(`${ENVIRONMENT}mq.mlmodelscope.org`)"
-        - "traefik.http.routers.mlmodelscope-uploader.entrypoints=websecure"
-        - "traefik.http.routers.mlmodelscope-uploader.tls.certresolver=letsencrypt"
-        - "traefik.http.services.mlmodelscope-uploader.loadbalancer.server.port=15672"
+        - "traefik.http.routers.mlmodelscope-mq.rule=Host(`${ENVIRONMENT}mq.mlmodelscope.org`)"
+        - "traefik.http.routers.mlmodelscope-mq.entrypoints=websecure"
+        - "traefik.http.routers.mlmodelscope-mq.tls.certresolver=letsencrypt"
+        - "traefik.http.services.mlmodelscope-mq.loadbalancer.server.port=15672"
 
 networks:
   traefik:
