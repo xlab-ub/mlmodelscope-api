@@ -7,6 +7,7 @@ services:
       - DB_DBNAME=$DB_DBNAME
       - DB_DRIVER=$DB_DRIVER
       - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
       - MQ_HOST=$MQ_HOST
