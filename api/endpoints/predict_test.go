@@ -19,8 +19,9 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresContentType", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/predict", strings.NewReader("{architecture: \"x\", framework: \"x\", model: \"x\", inputs: []}"))
-		req.Header.Set("content-type", "application/json")
+		requestBody := validPredictRequestBody("pytorch")
+		jsonBody, _ := json.Marshal(requestBody)
+		req, _ := http.NewRequest("POST", "/predict", strings.NewReader(string(jsonBody)))
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
