@@ -13,6 +13,7 @@ import (
 
 func TestPredictRoute(t *testing.T) {
 	openDatabase()
+	createTestModelAndFramework()
 	defer cleanupTestDatabase()
 	router := SetupRoutes()
 
@@ -28,31 +29,13 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresArchitecture", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "",
-			Framework:             "x",
 			Inputs:                []string{"x"},
-			Model:                 "x",
+			Model:                 1,
 			DesiredResultModality: "x",
 		}
 
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
-		router.ServeHTTP(w, req)
-
-		assert.Equal(t, 400, w.Code)
-	})
-
-	t.Run("RequiresFramework", func(t *testing.T) {
-		requestBody := &predictRequestBody{
-			Architecture:          "x",
-			Framework:             "",
-			Inputs:                []string{"x"},
-			Model:                 "x",
-			DesiredResultModality: "x",
-		}
-		jsonBody, _ := json.Marshal(requestBody)
-
-		w := httptest.NewRecorder()
-		req := NewJsonRequest("POST", "/predict", jsonBody)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
@@ -61,9 +44,8 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresInputs", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
-			Framework:             "x",
 			Inputs:                []string{},
-			Model:                 "x",
+			Model:                 1,
 			DesiredResultModality: "x",
 		}
 
@@ -74,12 +56,11 @@ func TestPredictRoute(t *testing.T) {
 		assert.Equal(t, 400, w.Code)
 	})
 
-	t.Run("RequiresModel", func(t *testing.T) {
+	t.Run("RequiresValidModelId", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
-			Framework:             "x",
 			Inputs:                []string{"x"},
-			Model:                 "",
+			Model:                 2,
 			DesiredResultModality: "x",
 		}
 
@@ -93,15 +74,13 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresDesiredResultModality", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
-			Framework:             "x",
 			Inputs:                []string{"x"},
-			Model:                 "x",
+			Model:                 1,
 			DesiredResultModality: "",
 		}
-		jsonBody, _ := json.Marshal(requestBody)
 
 		w := httptest.NewRecorder()
-		req := NewJsonRequest("POST", "/predict", jsonBody)
+		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)

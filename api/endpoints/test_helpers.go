@@ -3,6 +3,7 @@ package endpoints
 import (
 	"api/api_db"
 	"api/db"
+	"api/db/models"
 	"bytes"
 	"encoding/json"
 	"github.com/c3sr/mq/interfaces"
@@ -17,6 +18,23 @@ func openDatabase() {
 	os.Setenv("DB_HOST", "models_test.sqlite")
 	testDb, _ = api_db.GetDatabase()
 	testDb.Migrate()
+}
+
+func createTestModelAndFramework() {
+	testDb.CreateModel(&models.Model{
+		Attributes:  models.ModelAttributes{},
+		Description: "Test Model",
+		Details:     models.ModelDetails{},
+		Framework:   &models.Framework{
+			Name:      "PyTorch",
+			Version:   "1.0.0",
+		},
+		Input:       models.ModelOutput{},
+		License:     "",
+		Name:        "",
+		Output:      models.ModelOutput{},
+		Version:     "",
+	})
 }
 
 func cleanupTestDatabase() {
@@ -41,9 +59,8 @@ func NewJsonRequest(method string, url string, body interface{}) (request *http.
 func validPredictRequestBody(framework string) (body *predictRequestBody) {
 	return &predictRequestBody{
 		Architecture:          "amd64",
-		Framework:             framework,
 		Inputs:                []string{"input_url"},
-		Model:                 "AlexNet-v1.0",
+		Model:                 1,
 		DesiredResultModality: "image_classification",
 	}
 }
