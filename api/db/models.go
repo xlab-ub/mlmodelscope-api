@@ -1,6 +1,9 @@
 package db
 
-import "api/db/models"
+import (
+	"api/db/models"
+	"fmt"
+)
 
 type ModelInteractor interface {
 	CreateModel(*models.Model) error
@@ -17,6 +20,16 @@ func (d *Db) CreateModel(m *models.Model) (err error) {
 
 func (d *Db) GetAllModels() (m []models.Model, err error) {
 	d.database.Joins("Framework").Find(&m)
+
+	return
+}
+
+func (d *Db) GetModelById(id uint) (m *models.Model, err error) {
+	d.database.Joins("Framework").First(&m, id)
+
+	if m.ID != id {
+		return nil, fmt.Errorf("Unknown Model Id: %d", id)
+	}
 
 	return
 }

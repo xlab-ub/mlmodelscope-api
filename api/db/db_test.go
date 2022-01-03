@@ -110,6 +110,17 @@ func TestCreateAndQueryFrameworks(t *testing.T) {
 	assert.Equal(t, "fw2", frameworks[1].Name)
 }
 
+func TestQueryModelById(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createModelNamed("modelById")
+	createModelNamed("modelById2")
+
+	result, _ := testDb.GetModelById(2)
+
+	assert.Equal(t, "modelById2", result.Name)
+}
+
 func TestQueryModelsByFrameworkId(t *testing.T) {
 	CreateTestDatabase()
 	defer cleanupTestDatabase()
