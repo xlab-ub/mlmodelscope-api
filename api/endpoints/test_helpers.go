@@ -56,7 +56,7 @@ func NewJsonRequest(method string, url string, body interface{}) (request *http.
 	return
 }
 
-func validPredictRequestBody(framework string) (body *predictRequestBody) {
+func validPredictRequestBody() (body *predictRequestBody) {
 	return &predictRequestBody{
 		Architecture:          "amd64",
 		Inputs:                []string{"input_url"},

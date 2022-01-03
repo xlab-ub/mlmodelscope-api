@@ -19,7 +19,7 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresContentType", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		requestBody := validPredictRequestBody("pytorch")
+		requestBody := validPredictRequestBody()
 		jsonBody, _ := json.Marshal(requestBody)
 		req, _ := http.NewRequest("POST", "/predict", strings.NewReader(string(jsonBody)))
 		router.ServeHTTP(w, req)
@@ -90,7 +90,7 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("AcceptsValidRequest", func(t *testing.T) {
 		api_mq.SetMessageQueue(api_mq.NullMessageQueue())
 		router := SetupRoutes()
-		requestBody := validPredictRequestBody("pytorch")
+		requestBody := validPredictRequestBody()
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
@@ -106,7 +106,7 @@ func TestPredictRoute(t *testing.T) {
 		spy := &messageQueueSpy{}
 		api_mq.SetMessageQueue(spy)
 		router := SetupRoutes()
-		requestBody := validPredictRequestBody("pytorch")
+		requestBody := validPredictRequestBody()
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
