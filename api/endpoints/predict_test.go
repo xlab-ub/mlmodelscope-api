@@ -30,9 +30,11 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresArchitecture", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "",
+			BatchSize:             1,
+			DesiredResultModality: "x",
 			Inputs:                []string{"x"},
 			Model:                 1,
-			DesiredResultModality: "x",
+			TraceLevel:            "NO_TRACE",
 		}
 
 		w := httptest.NewRecorder()
@@ -45,9 +47,11 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresInputs", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "x",
 			Inputs:                []string{},
 			Model:                 1,
-			DesiredResultModality: "x",
+			TraceLevel:            "NO_TRACE",
 		}
 
 		w := httptest.NewRecorder()
@@ -60,9 +64,11 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresValidModelId", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "x",
 			Inputs:                []string{"x"},
 			Model:                 2,
-			DesiredResultModality: "x",
+			TraceLevel:            "NO_TRACE",
 		}
 
 		w := httptest.NewRecorder()
@@ -75,9 +81,43 @@ func TestPredictRoute(t *testing.T) {
 	t.Run("RequiresDesiredResultModality", func(t *testing.T) {
 		requestBody := &predictRequestBody{
 			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "",
 			Inputs:                []string{"x"},
 			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
+
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, 400, w.Code)
+	})
+
+	t.Run("RequiresBatchSize", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
 			DesiredResultModality: "",
+			Inputs:                []string{"x"},
+			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
+
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, 400, w.Code)
+	})
+
+	t.Run("RequiresTraceLevel", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "",
+			Inputs:                []string{"x"},
+			Model:                 1,
 		}
 
 		w := httptest.NewRecorder()

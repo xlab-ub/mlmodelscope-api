@@ -25,15 +25,15 @@ func createTestModelAndFramework() {
 		Attributes:  models.ModelAttributes{},
 		Description: "Test Model",
 		Details:     models.ModelDetails{},
-		Framework:   &models.Framework{
-			Name:      "PyTorch",
-			Version:   "1.0.0",
+		Framework: &models.Framework{
+			Name:    "PyTorch",
+			Version: "1.0.0",
 		},
-		Input:       models.ModelOutput{},
-		License:     "",
-		Name:        "",
-		Output:      models.ModelOutput{},
-		Version:     "",
+		Input:   models.ModelOutput{},
+		License: "",
+		Name:    "",
+		Output:  models.ModelOutput{},
+		Version: "",
 	})
 }
 
@@ -59,9 +59,11 @@ func NewJsonRequest(method string, url string, body interface{}) (request *http.
 func validPredictRequestBody() (body *predictRequestBody) {
 	return &predictRequestBody{
 		Architecture:          "amd64",
+		BatchSize:             1,
+		DesiredResultModality: "image_classification",
 		Inputs:                []string{"input_url"},
 		Model:                 1,
-		DesiredResultModality: "image_classification",
+		TraceLevel:            "NO_TRACE",
 	}
 }
 

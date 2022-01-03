@@ -10,9 +10,11 @@ import (
 
 type predictRequestBody struct {
 	Architecture          string   `json:"architecture,omitempty" binding:"required"`
+	BatchSize             uint     `json:"batchSize,omitempty" binding:"required"`
+	DesiredResultModality string   `json:"desiredResultModality,omitempty" binding:"required"`
 	Inputs                []string `json:"inputs,omitempty" binding:"required"`
 	Model                 uint     `json:"model,omitempty" binding:"required"`
-	DesiredResultModality string   `json:"desiredResultModality,omitempty" binding:"required"`
+	TraceLevel            string   `json:"traceLevel,omitempty" binding:"required"`
 }
 
 type predictResponseBody struct {
