@@ -7,10 +7,11 @@ import (
 )
 
 type predictRequestBody struct {
-	Architecture string   `json:"architecture,omitempty" binding:"required"`
-	Framework    string   `json:"framework,omitempty" binding:"required"`
-	Inputs       []string `json:"inputs,omitempty" binding:"required"`
-	Model        string   `json:"model,omitempty" binding:"required"`
+	Architecture          string   `json:"architecture,omitempty" binding:"required"`
+	Framework             string   `json:"framework,omitempty" binding:"required"`
+	Inputs                []string `json:"inputs,omitempty" binding:"required"`
+	Model                 string   `json:"model,omitempty" binding:"required"`
+	DesiredResultModality string   `json:"desiredResultModality,omitempty" binding:"required"`
 }
 
 type predictResponseBody struct {

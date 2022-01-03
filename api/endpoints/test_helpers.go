@@ -40,10 +40,11 @@ func NewJsonRequest(method string, url string, body interface{}) (request *http.
 
 func validPredictRequestBody(framework string) (body *predictRequestBody) {
 	return &predictRequestBody{
-		Architecture: "amd64",
-		Framework:    framework,
-		Inputs:       []string{"input_url"},
-		Model:        "AlexNet-v1.0",
+		Architecture:          "amd64",
+		Framework:             framework,
+		Inputs:                []string{"input_url"},
+		Model:                 "AlexNet-v1.0",
+		DesiredResultModality: "image_classification",
 	}
 }
 

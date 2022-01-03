@@ -27,10 +27,11 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresArchitecture", func(t *testing.T) {
 		requestBody := &predictRequestBody{
-			Architecture: "",
-			Framework:    "x",
-			Inputs:       []string{"x"},
-			Model:        "x",
+			Architecture:          "",
+			Framework:             "x",
+			Inputs:                []string{"x"},
+			Model:                 "x",
+			DesiredResultModality: "x",
 		}
 		jsonBody, _ := json.Marshal(requestBody)
 
@@ -43,10 +44,11 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresFramework", func(t *testing.T) {
 		requestBody := &predictRequestBody{
-			Architecture: "x",
-			Framework:    "",
-			Inputs:       []string{"x"},
-			Model:        "x",
+			Architecture:          "x",
+			Framework:             "",
+			Inputs:                []string{"x"},
+			Model:                 "x",
+			DesiredResultModality: "x",
 		}
 		jsonBody, _ := json.Marshal(requestBody)
 
@@ -59,10 +61,11 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresInputs", func(t *testing.T) {
 		requestBody := &predictRequestBody{
-			Architecture: "x",
-			Framework:    "x",
-			Inputs:       []string{},
-			Model:        "x",
+			Architecture:          "x",
+			Framework:             "x",
+			Inputs:                []string{},
+			Model:                 "x",
+			DesiredResultModality: "x",
 		}
 		jsonBody, _ := json.Marshal(requestBody)
 
@@ -75,10 +78,28 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("RequiresModel", func(t *testing.T) {
 		requestBody := &predictRequestBody{
-			Architecture: "x",
-			Framework:    "x",
-			Inputs:       []string{"x"},
-			Model:        "",
+			Architecture:          "x",
+			Framework:             "x",
+			Inputs:                []string{"x"},
+			Model:                 "",
+			DesiredResultModality: "x",
+		}
+		jsonBody, _ := json.Marshal(requestBody)
+
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", jsonBody)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, 400, w.Code)
+	})
+
+	t.Run("RequiresDesiredResultModality", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			Framework:             "x",
+			Inputs:                []string{"x"},
+			Model:                 "x",
+			DesiredResultModality: "",
 		}
 		jsonBody, _ := json.Marshal(requestBody)
 
