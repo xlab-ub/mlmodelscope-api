@@ -33,10 +33,9 @@ func TestPredictRoute(t *testing.T) {
 			Model:                 "x",
 			DesiredResultModality: "x",
 		}
-		jsonBody, _ := json.Marshal(requestBody)
 
 		w := httptest.NewRecorder()
-		req := NewJsonRequest("POST", "/predict", jsonBody)
+		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
@@ -67,10 +66,9 @@ func TestPredictRoute(t *testing.T) {
 			Model:                 "x",
 			DesiredResultModality: "x",
 		}
-		jsonBody, _ := json.Marshal(requestBody)
 
 		w := httptest.NewRecorder()
-		req := NewJsonRequest("POST", "/predict", jsonBody)
+		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
@@ -84,10 +82,9 @@ func TestPredictRoute(t *testing.T) {
 			Model:                 "",
 			DesiredResultModality: "x",
 		}
-		jsonBody, _ := json.Marshal(requestBody)
 
 		w := httptest.NewRecorder()
-		req := NewJsonRequest("POST", "/predict", jsonBody)
+		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
