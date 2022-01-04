@@ -3,9 +3,12 @@
 package endpoints
 
 import (
+	"api/api_db"
 	"api/api_mq"
+	"api/db/models"
 	"encoding/json"
 	"github.com/c3sr/mq/interfaces"
+	"github.com/c3sr/mq/messages"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http/httptest"
@@ -17,6 +20,38 @@ import (
 var messageQueue interfaces.MessageQueue
 
 func setupForIntegrationTest() {
+	db, _ := api_db.GetDatabase()
+	db.Migrate()
+	db.CreateModel(&models.Model{
+		Attributes:  models.ModelAttributes{},
+		Description: "for integration test",
+		Details:     models.ModelDetails{},
+		Framework:   &models.Framework{
+			Name:      "PyTorch",
+			Version:   "1.0",
+		},
+		Input:       models.ModelOutput{},
+		License:     "",
+		Name:        "integrate",
+		Output:      models.ModelOutput{},
+		Version:     "1.0",
+	})
+
+	db.CreateModel(&models.Model{
+		Attributes:  models.ModelAttributes{},
+		Description: "for integration test",
+		Details:     models.ModelDetails{},
+		Framework:   &models.Framework{
+			Name:      "Mock",
+			Version:   "1.0",
+		},
+		Input:       models.ModelOutput{},
+		License:     "",
+		Name:        "Mock",
+		Output:      models.ModelOutput{},
+		Version:     "1.0",
+	})
+
 	go api_mq.ConnectToMq()
 
 	time.Sleep(time.Millisecond * 100)
@@ -35,14 +70,18 @@ func TestPredictEndpointQueuesMessage(t *testing.T) {
 	assert.Nil(t, err, "SubscribeToChannel should succeed")
 
 	router := SetupRoutes()
-	requestBody := validPredictRequestBody("pytorch")
+	requestBody := validPredictRequestBody()
 	w := httptest.NewRecorder()
 	req := NewJsonRequest("POST", "/predict", requestBody)
 	router.ServeHTTP(w, req)
 
+	assert.Equal(t, 200, w.Code, "predict endpoint should return success")
+
 	message := <-channel
 
-	assert.Equal(t, "do some work", string(message.Body))
+	var response messages.PredictByModelName
+	json.Unmarshal(message.Body, &response)
+	assert.Equal(t, "integrate_1.0", response.ModelName)
 	messageQueue.Acknowledge(message)
 }
 
@@ -51,7 +90,9 @@ func TestPredictEndpointAgentRoundTrip(t *testing.T) {
 	channel, _ := messageQueue.SubscribeToChannel("API")
 
 	router := SetupRoutes()
-	requestBody := validPredictRequestBody("mock")
+	requestBody := validPredictRequestBody()
+	// Predictions for model ID 2 should be processed by the mock agent
+	requestBody.Model = 2
 	w := httptest.NewRecorder()
 	req := NewJsonRequest("POST", "/predict", requestBody)
 	router.ServeHTTP(w, req)
