@@ -31,9 +31,9 @@ func createTestModelAndFramework() {
 		},
 		Input:   models.ModelOutput{},
 		License: "",
-		Name:    "",
+		Name:    "Test_Model",
 		Output:  models.ModelOutput{},
-		Version: "",
+		Version: "1.0",
 	})
 }
 

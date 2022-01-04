@@ -5,6 +5,7 @@ package endpoints
 import (
 	"api/api_mq"
 	"encoding/json"
+	"github.com/c3sr/mq/messages"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -152,8 +153,11 @@ func TestPredictRoute(t *testing.T) {
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
+		message := messages.PredictByModelName{}
+		err := json.Unmarshal([]byte(spy.channel.message), &message)
 
+		assert.Nil(t, err)
 		assert.Equal(t, "agent-pytorch-amd64", spy.publishChannel)
-		assert.Equal(t, "do some work", spy.channel.message)
+		assert.Equal(t, "test_model_1.0", message.ModelName)
 	})
 }
