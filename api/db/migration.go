@@ -20,7 +20,7 @@ func (d *Db) Migrate() (err error) {
 			return
 		}
 
-		recordMigration(d, nextMigration + index + 1)
+		recordMigration(d, nextMigration+index+1)
 	}
 
 	return
@@ -40,7 +40,7 @@ func lookupNextMigration(d *Db) (lastMigration int) {
 
 func recordMigration(d *Db, number int) {
 	d.database.Create(&migrations.Migrations{
-		Migration: number,
+		Migration:  number,
 		MigratedAt: time.Now(),
 	})
 }
@@ -49,8 +49,9 @@ func recordMigration(d *Db, number int) {
 // NEVER remove any migrator function from this list that has
 //   already been run against a database that can't be recreated
 //   from scratch (for example the Staging and Production databases)
-var migrators = [](func(*gorm.DB) error) {
+var migrators = [](func(*gorm.DB) error){
 	migrations.CreateMigrationsTable,
 	migrations.CreateFrameworksTable,
 	migrations.CreateModelsTable,
+	migrations.CreateTrialsTable,
 }

@@ -31,6 +31,7 @@ var (
 type Db struct {
 	FrameworkInteractor
 	ModelInteractor
+	TrialInteractor
 	Migrator
 
 	database *gorm.DB
