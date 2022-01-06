@@ -69,17 +69,19 @@ func validPredictRequestBody() (body *predictRequestBody) {
 
 type messageQueueSpy struct {
 	channel        *channelSpy
+	correlationId  string
 	publishChannel string
 }
 
 type channelSpy struct {
+	mq      *messageQueueSpy
 	message string
 }
 
 func (c *channelSpy) SendMessage(message string) (string, error) {
 	c.message = message
 
-	return "x", nil
+	return c.mq.correlationId, nil
 }
 
 func (c *channelSpy) SendResponse(message string, correlationId string) error {
@@ -99,7 +101,9 @@ func (m *messageQueueSpy) Shutdown() {
 }
 
 func (m *messageQueueSpy) GetPublishChannel(name string) (interfaces.Channel, error) {
-	m.channel = &channelSpy{}
+	m.channel = &channelSpy{
+		mq: m,
+	}
 	m.publishChannel = name
 
 	return m.channel, nil

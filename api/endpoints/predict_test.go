@@ -132,7 +132,6 @@ func TestPredictRoute(t *testing.T) {
 
 	t.Run("AcceptsValidRequest", func(t *testing.T) {
 		api_mq.SetMessageQueue(api_mq.NullMessageQueue())
-		router := SetupRoutes()
 		requestBody := validPredictRequestBody()
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
@@ -142,13 +141,12 @@ func TestPredictRoute(t *testing.T) {
 		json.Unmarshal(w.Body.Bytes(), &res)
 
 		assert.Equal(t, 200, w.Code)
-		assert.Equal(t, "1", res.ExperimentId)
+		assert.Equal(t, "", res.ExperimentId)
 	})
 
 	t.Run("SendsMessageToAgentQueue", func(t *testing.T) {
 		spy := &messageQueueSpy{}
 		api_mq.SetMessageQueue(spy)
-		router := SetupRoutes()
 		requestBody := validPredictRequestBody()
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
@@ -159,5 +157,23 @@ func TestPredictRoute(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "agent-pytorch-amd64", spy.publishChannel)
 		assert.Equal(t, "test_model_1.0", message.ModelName)
+	})
+
+	t.Run("CreatesTrial", func(t *testing.T) {
+		spy := &messageQueueSpy{
+			correlationId: "trial1",
+		}
+		api_mq.SetMessageQueue(spy)
+		requestBody := validPredictRequestBody()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+
+		trial, _ := testDb.GetTrialById("trial1")
+
+		assert.NotNil(t, trial)
+		assert.Equal(t, uint(1), trial.ModelID)
+		assert.Equal(t, 1, len(trial.Inputs))
+		assert.Equal(t, "input_url", trial.Inputs[0].URL)
 	})
 }

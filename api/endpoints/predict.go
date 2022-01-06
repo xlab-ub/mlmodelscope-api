@@ -44,9 +44,22 @@ func Predict(c *gin.Context) {
 	channel, _ := messageQueue.GetPublishChannel(channelName)
 	message := makePredictMessage(requestBody, model)
 	messageBytes, _ := json.Marshal(message)
-	_, _ = channel.SendMessage(string(messageBytes))
+	correlationId, _ := channel.SendMessage(string(messageBytes))
 
-	c.JSON(200, &predictResponseBody{ExperimentId: "1"})
+	var inputs []models.TrialInput
+	for _, input := range requestBody.Inputs {
+		inputs = append(inputs, models.TrialInput{
+			URL: input,
+		})
+	}
+
+	db.CreateTrial(&models.Trial{
+		ID:      correlationId,
+		ModelID: model.ID,
+		Inputs:  inputs,
+	})
+
+	c.JSON(200, &predictResponseBody{ExperimentId: correlationId})
 }
 
 func makePredictMessage(request *predictRequestBody, model *models.Model) *messages.PredictByModelName {
