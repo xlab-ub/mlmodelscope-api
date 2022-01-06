@@ -10,18 +10,7 @@ func CreateFrameworksTable(db *gorm.DB) (err error) {
 		gorm.Model
 	}
 
-	if err = db.Migrator().CreateTable(&Framework{}); err != nil {
-		return
-	}
-
-	if err = db.Migrator().AddColumn(&models.Framework{}, "name"); err != nil {
-		return
-	}
-
-	if err = db.Migrator().AddColumn(&models.Framework{}, "version"); err != nil {
-		return
-	}
-
-	return
+	db.Migrator().CreateTable(&Framework{})
+	db.Migrator().AddColumn(&models.Framework{}, "name")
+	return db.Migrator().AddColumn(&models.Framework{}, "version")
 }
-
