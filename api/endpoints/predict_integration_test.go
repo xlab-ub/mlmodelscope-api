@@ -26,30 +26,30 @@ func setupForIntegrationTest() {
 		Attributes:  models.ModelAttributes{},
 		Description: "for integration test",
 		Details:     models.ModelDetails{},
-		Framework:   &models.Framework{
-			Name:      "PyTorch",
-			Version:   "1.0",
+		Framework: &models.Framework{
+			Name:    "PyTorch",
+			Version: "1.0",
 		},
-		Input:       models.ModelOutput{},
-		License:     "",
-		Name:        "integrate",
-		Output:      models.ModelOutput{},
-		Version:     "1.0",
+		Input:   models.ModelOutput{},
+		License: "",
+		Name:    "integrate",
+		Output:  models.ModelOutput{},
+		Version: "1.0",
 	})
 
 	db.CreateModel(&models.Model{
 		Attributes:  models.ModelAttributes{},
 		Description: "for integration test",
 		Details:     models.ModelDetails{},
-		Framework:   &models.Framework{
-			Name:      "Mock",
-			Version:   "1.0",
+		Framework: &models.Framework{
+			Name:    "Mock",
+			Version: "1.0",
 		},
-		Input:       models.ModelOutput{},
-		License:     "",
-		Name:        "Mock",
-		Output:      models.ModelOutput{},
-		Version:     "1.0",
+		Input:   models.ModelOutput{},
+		License: "",
+		Name:    "Mock",
+		Output:  models.ModelOutput{},
+		Version: "1.0",
 	})
 
 	go api_mq.ConnectToMq()
@@ -87,6 +87,7 @@ func TestPredictEndpointQueuesMessage(t *testing.T) {
 
 func TestPredictEndpointAgentRoundTrip(t *testing.T) {
 	setupForIntegrationTest()
+	db, _ := api_db.GetDatabase()
 	channel, _ := messageQueue.SubscribeToChannel("API")
 
 	router := SetupRoutes()
@@ -97,12 +98,18 @@ func TestPredictEndpointAgentRoundTrip(t *testing.T) {
 	req := NewJsonRequest("POST", "/predict", requestBody)
 	router.ServeHTTP(w, req)
 
+	response := &predictResponseBody{}
+	json.Unmarshal(w.Body.Bytes(), response)
 	message := <-channel
 	prediction := &mockPredictionResponse{}
 	json.Unmarshal(message.Body, prediction)
 
 	assert.Equal(t, "ec1578ee-4ad8-46af-b7e7-10d6d1570abc", prediction.Id)
 	messageQueue.Acknowledge(message)
+
+	trial, _ := db.GetTrialById(message.CorrelationId)
+	assert.NotNil(t, trial)
+	assert.Equal(t, response.ExperimentId, trial.ID)
 }
 
 type mockPredictionResponse struct {
