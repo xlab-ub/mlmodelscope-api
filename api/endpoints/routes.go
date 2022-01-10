@@ -13,6 +13,10 @@ func SetupRoutes() *gin.Engine {
 		models.GET("/task/:task", ListModelsByTask)
 	}
 	r.POST("/predict", Predict)
+	trial := r.Group("/trial")
+	{
+		trial.GET("/:trial_id", GetTrial)
+	}
 
 	return r
 }

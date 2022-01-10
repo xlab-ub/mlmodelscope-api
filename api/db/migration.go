@@ -1,7 +1,9 @@
 package db
 
 import (
-	"api/db/models"
+	"api/db/migrations"
+	"gorm.io/gorm"
+	"time"
 )
 
 type Migrator interface {
@@ -9,12 +11,47 @@ type Migrator interface {
 }
 
 func (d *Db) Migrate() (err error) {
-	err = d.database.AutoMigrate(&models.Model{})
-	if err != nil {
-		return
+	nextMigration := lookupNextMigration(d)
+
+	for index, migrator := range migrators[nextMigration:] {
+		err = migrator(d.database)
+
+		if err != nil {
+			return
+		}
+
+		recordMigration(d, nextMigration+index+1)
 	}
 
-	err = d.database.AutoMigrate(&models.Framework{})
+	return
+}
+
+func lookupNextMigration(d *Db) (lastMigration int) {
+	if d.database.Migrator().HasTable(&migrations.Migrations{}) {
+		m := migrations.Migrations{}
+		d.database.Order("migration desc").First(&m)
+		lastMigration = m.Migration
+	} else {
+		lastMigration = 0
+	}
 
 	return
+}
+
+func recordMigration(d *Db, number int) {
+	d.database.Create(&migrations.Migrations{
+		Migration:  number,
+		MigratedAt: time.Now(),
+	})
+}
+
+// ONLY append new migrator functions to the end of this list
+// NEVER remove any migrator function from this list that has
+//   already been run against a database that can't be recreated
+//   from scratch (for example the Staging and Production databases)
+var migrators = [](func(*gorm.DB) error){
+	migrations.CreateMigrationsTable,
+	migrations.CreateFrameworksTable,
+	migrations.CreateModelsTable,
+	migrations.CreateTrialsTable,
 }

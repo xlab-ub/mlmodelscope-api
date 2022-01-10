@@ -5,13 +5,28 @@ services:
       context: ./api/
       dockerfile: ../docker/Dockerfile.api
 
+    depends_on:
+      - db
+      - mq
+
     ports:
-      - "2345:2345"
+      - "8080:8080"
 
   uploader:
     build:
       context: ./uploader/
       dockerfile: ../docker/Dockerfile.uploader
+
+  db:
+    image: postgres:14.1
+
+    environment:
+      POSTGRES_USER: "$DB_USER"
+      POSTGRES_PASSWORD: "$DB_PASSWORD"
+      POSTGRES_DB: "$DB_DBNAME"
+
+    volumes:
+      - ./docker/data:/docker-entrypoint-initdb.d/
 
 networks:
   traefik:

@@ -1,8 +1,11 @@
+// +build !integration
+
 package endpoints
 
 import (
 	"api/api_mq"
 	"encoding/json"
+	"github.com/c3sr/mq/messages"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -11,113 +14,166 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPredictRouteRequiresContentType(t *testing.T) {
+func TestPredictRoute(t *testing.T) {
+	openDatabase()
+	createTestModelAndFramework()
+	defer cleanupTestDatabase()
 	router := SetupRoutes()
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/predict", strings.NewReader("{architecture: \"x\", framework: \"x\", model: \"x\", inputs: []}"))
-	req.Header.Set("content-type", "application/json")
-	router.ServeHTTP(w, req)
+	t.Run("RequiresContentType", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		requestBody := validPredictRequestBody()
+		jsonBody, _ := json.Marshal(requestBody)
+		req, _ := http.NewRequest("POST", "/predict", strings.NewReader(string(jsonBody)))
+		router.ServeHTTP(w, req)
 
-	assert.Equal(t, 400, w.Code)
-}
+		assert.Equal(t, 400, w.Code)
+	})
 
-func TestPredictRouteRequiresArchitecture(t *testing.T) {
-	router := SetupRoutes()
+	t.Run("RequiresArchitecture", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "",
+			BatchSize:             1,
+			DesiredResultModality: "x",
+			Inputs:                []string{"x"},
+			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
 
-	requestBody := &predictRequestBody{
-		Architecture: "",
-		Framework:    "x",
-		Inputs:       []string{"x"},
-		Model:        "x",
-	}
-	jsonBody, _ := json.Marshal(requestBody)
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", jsonBody)
-	router.ServeHTTP(w, req)
+		assert.Equal(t, 400, w.Code)
+	})
 
-	assert.Equal(t, 400, w.Code)
-}
+	t.Run("RequiresInputs", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "x",
+			Inputs:                []string{},
+			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
 
-func TestPredictRouteRequiresFramework(t *testing.T) {
-	router := SetupRoutes()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-	requestBody := &predictRequestBody{
-		Architecture: "x",
-		Framework:    "",
-		Inputs:       []string{"x"},
-		Model:        "x",
-	}
-	jsonBody, _ := json.Marshal(requestBody)
+		assert.Equal(t, 400, w.Code)
+	})
 
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", jsonBody)
-	router.ServeHTTP(w, req)
+	t.Run("RequiresValidModelId", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "x",
+			Inputs:                []string{"x"},
+			Model:                 2,
+			TraceLevel:            "NO_TRACE",
+		}
 
-	assert.Equal(t, 400, w.Code)
-}
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-func TestPredictRouteRequiresInputs(t *testing.T) {
-	router := SetupRoutes()
+		assert.Equal(t, 400, w.Code)
+	})
 
-	requestBody := &predictRequestBody{
-		Architecture: "x",
-		Framework:    "x",
-		Inputs:       []string{},
-		Model:        "x",
-	}
-	jsonBody, _ := json.Marshal(requestBody)
+	t.Run("RequiresDesiredResultModality", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "",
+			Inputs:                []string{"x"},
+			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
 
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", jsonBody)
-	router.ServeHTTP(w, req)
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-	assert.Equal(t, 400, w.Code)
-}
+		assert.Equal(t, 400, w.Code)
+	})
 
-func TestPredictRouteRequiresModel(t *testing.T) {
-	router := SetupRoutes()
+	t.Run("RequiresBatchSize", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			DesiredResultModality: "",
+			Inputs:                []string{"x"},
+			Model:                 1,
+			TraceLevel:            "NO_TRACE",
+		}
 
-	requestBody := &predictRequestBody{
-		Architecture: "x",
-		Framework:    "x",
-		Inputs:       []string{"x"},
-		Model:        "",
-	}
-	jsonBody, _ := json.Marshal(requestBody)
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", jsonBody)
-	router.ServeHTTP(w, req)
+		assert.Equal(t, 400, w.Code)
+	})
 
-	assert.Equal(t, 400, w.Code)
-}
+	t.Run("RequiresTraceLevel", func(t *testing.T) {
+		requestBody := &predictRequestBody{
+			Architecture:          "x",
+			BatchSize:             1,
+			DesiredResultModality: "",
+			Inputs:                []string{"x"},
+			Model:                 1,
+		}
 
-func TestPredictRouteAcceptsValidRequest(t *testing.T) {
-	api_mq.SetMessageQueue(api_mq.NullMessageQueue())
-	router := SetupRoutes()
-	requestBody := validPredictRequestBody("pytorch")
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", requestBody)
-	router.ServeHTTP(w, req)
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-	res := predictResponseBody{}
-	json.Unmarshal(w.Body.Bytes(), &res)
+		assert.Equal(t, 400, w.Code)
+	})
 
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "1", res.ExperimentId)
-}
+	t.Run("AcceptsValidRequest", func(t *testing.T) {
+		api_mq.SetMessageQueue(api_mq.NullMessageQueue())
+		requestBody := validPredictRequestBody()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
 
-func TestPredictRequestSendsMessageToAgentQueue(t *testing.T) {
-	spy := &messageQueueSpy{}
-	api_mq.SetMessageQueue(spy)
-	router := SetupRoutes()
-	requestBody := validPredictRequestBody("pytorch")
-	w := httptest.NewRecorder()
-	req := NewJsonRequest("POST", "/predict", requestBody)
-	router.ServeHTTP(w, req)
+		res := predictResponseBody{}
+		json.Unmarshal(w.Body.Bytes(), &res)
 
-	assert.Equal(t, "agent-pytorch-amd64", spy.publishChannel)
-	assert.Equal(t, "do some work", spy.channel.message)
+		assert.Equal(t, 200, w.Code)
+		assert.Equal(t, "", res.ExperimentId)
+	})
+
+	t.Run("SendsMessageToAgentQueue", func(t *testing.T) {
+		spy := &messageQueueSpy{}
+		api_mq.SetMessageQueue(spy)
+		requestBody := validPredictRequestBody()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+		message := messages.PredictByModelName{}
+		err := json.Unmarshal([]byte(spy.channel.message), &message)
+
+		assert.Nil(t, err)
+		assert.Equal(t, "agent-pytorch-amd64", spy.publishChannel)
+		assert.Equal(t, "test_model_1.0", message.ModelName)
+	})
+
+	t.Run("CreatesTrial", func(t *testing.T) {
+		spy := &messageQueueSpy{
+			correlationId: "trial1",
+		}
+		api_mq.SetMessageQueue(spy)
+		requestBody := validPredictRequestBody()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+
+		trial, _ := testDb.GetTrialById("trial1")
+
+		assert.NotNil(t, trial)
+		assert.Equal(t, uint(1), trial.ModelID)
+		assert.Equal(t, 1, len(trial.Inputs))
+		assert.Equal(t, "input_url", trial.Inputs[0].URL)
+	})
 }
