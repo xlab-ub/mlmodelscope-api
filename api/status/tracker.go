@@ -38,7 +38,6 @@ func StartTracker(done chan bool) {
 		case <-done:
 			running = false
 			fmt.Println("[INFO] done")
-		default:
 		}
 	}
 }

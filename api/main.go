@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	go api_mq.ConnectToMq()
+	api_mq.ConnectToMq()
 	done := make(chan bool)
 	go status.StartTracker(done)
 
