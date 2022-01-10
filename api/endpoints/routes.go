@@ -15,7 +15,7 @@ func SetupRoutes() *gin.Engine {
 	r.POST("/predict", Predict)
 	trial := r.Group("/trial")
 	{
-		trial.POST("", CreateTrial)
+		trial.GET("/:trial_id", GetTrial)
 	}
 
 	return r

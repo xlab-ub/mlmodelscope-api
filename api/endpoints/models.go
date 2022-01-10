@@ -8,10 +8,6 @@ import (
 	"strconv"
 )
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 type ModelListResponse struct {
 	Models []models.Model `json:"models,omitempty"`
 }
