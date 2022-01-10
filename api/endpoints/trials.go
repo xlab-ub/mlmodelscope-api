@@ -12,17 +12,17 @@ import (
 type trialResponse struct {
 	ID          string       `json:"id"`
 	Inputs      []string     `json:"inputs"`
-	CompletedAt time.Time    `json:"completed_at"`
-	Results     trialResults `json:"results"`
+	CompletedAt *time.Time   `json:"completed_at,omitempty"`
+	Results     trialResults `json:"results,omitempty"`
 }
 
 type trialResults struct {
-	Responses []responseFeatures `json:"responses"`
-	TraceId   traceId            `json:"trace_id"`
+	Responses []responseFeatures `json:"responses,omitempty"`
+	TraceId   traceId            `json:"trace_id,omitempty"`
 }
 
 type responseFeatures struct {
-	Features []responseFeature `json:"features"`
+	Features []responseFeature `json:"features,omitempty"`
 }
 
 type responseFeature struct {
@@ -38,7 +38,7 @@ type featureClassification struct {
 }
 
 type traceId struct {
-	Id string `json:"id"`
+	Id string `json:"id,omitempty"`
 }
 
 func GetTrial(c *gin.Context) {

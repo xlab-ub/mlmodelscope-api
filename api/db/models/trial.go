@@ -10,7 +10,7 @@ type Trial struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time      `json:"-"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
-	CompletedAt time.Time
+	CompletedAt *time.Time
 	Model       *Model       `json:"model"`
 	ModelID     uint         `json:"-"`
 	Inputs      []TrialInput `json:"inputs"`

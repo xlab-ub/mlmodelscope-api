@@ -48,7 +48,7 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Equal(t, 1, len(trials))
 		assert.Equal(t, "trial1", trials[0].ID)
 		assert.Equal(t, uint(1), trials[0].Model.ID)
-		assert.Equal(t, time.Time{}, trials[0].CompletedAt)
+		assert.Nil(t, trials[0].CompletedAt)
 		assert.Equal(t, "", trials[0].Result)
 	})
 

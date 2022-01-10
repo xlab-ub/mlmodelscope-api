@@ -14,7 +14,8 @@ type TrialInteractor interface {
 }
 
 func (d *Db) CompleteTrial(trial *models.Trial, result string) error {
-	d.database.Model(&trial).Updates(models.Trial{CompletedAt: time.Now(), Result: result})
+	now := time.Now()
+	d.database.Model(&trial).Updates(models.Trial{CompletedAt: &now, Result: result})
 
 	return d.database.Error
 }

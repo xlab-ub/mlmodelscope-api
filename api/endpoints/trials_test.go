@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 )
 
 func TestTrialRoute(t *testing.T) {
@@ -54,7 +53,7 @@ func TestTrialRoute(t *testing.T) {
 
 		assert.Equal(t, "trial1", trial.ID)
 		assert.Equal(t, "test_url", trial.Inputs[0])
-		assert.True(t, trial.CompletedAt.Equal(time.Time{}))
+		assert.Nil(t, trial.CompletedAt)
 	})
 
 	t.Run("GetCompletedTrial", func(t *testing.T) {
@@ -81,7 +80,7 @@ func TestTrialRoute(t *testing.T) {
 
 		assert.Equal(t, "trial2", response.ID)
 		assert.Equal(t, "test_url", response.Inputs[0])
-		assert.True(t, response.CompletedAt.Equal(trial.CompletedAt))
+		assert.True(t, response.CompletedAt.Equal(*trial.CompletedAt))
 		assert.Equal(t, 1, len(response.Results.Responses))
 	})
 }
