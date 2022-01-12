@@ -9,8 +9,8 @@ start_postgres
 start_rabbitmq
 start_mock_agent
 
-echo "\nRunning integration tests..."
-go clean -testcache && go test -v -coverprofile integration.out --tags integration ./...
+echo "Running API..."
+go build . && ./api
 
 stop_postgres
 stop_rabbitmq
