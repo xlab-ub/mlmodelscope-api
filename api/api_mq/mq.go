@@ -5,10 +5,12 @@ import (
 	"github.com/c3sr/mq/interfaces"
 	"github.com/c3sr/mq/rabbit"
 	"log"
+	"sync"
 	"time"
 )
 
 var messageQueue interfaces.MessageQueue
+var mutex sync.Mutex
 
 func ConnectToMq() {
 	ready := make(chan bool)
@@ -31,6 +33,7 @@ func ConnectToMq() {
 				return
 			}
 		}
+		ready <- false
 	}()
 
 	select {
@@ -44,9 +47,15 @@ func ConnectToMq() {
 }
 
 func SetMessageQueue(queue interfaces.MessageQueue) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	messageQueue = queue
 }
 
 func GetMessageQueue() interfaces.MessageQueue {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	return messageQueue
 }
