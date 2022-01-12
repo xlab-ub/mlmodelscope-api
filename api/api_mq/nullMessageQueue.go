@@ -12,6 +12,10 @@ func (n *nullMessageQueue) Nack(message interfaces.Message) error {
 	return nil
 }
 
+func (n *nullMessageQueue) NotifyClose(chan error) {
+
+}
+
 func (n *nullMessageQueue) Shutdown() {
 }
 

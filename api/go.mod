@@ -3,7 +3,7 @@ module api
 go 1.15
 
 require (
-	github.com/c3sr/mq v0.1.7
+	github.com/c3sr/mq v0.1.8
 	github.com/gin-gonic/gin v1.7.7
 	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/postgres v1.2.3

@@ -96,6 +96,10 @@ func (m *messageQueueSpy) Nack(message interfaces.Message) error {
 	panic("implement me")
 }
 
+func (m *messageQueueSpy) NotifyClose(chan error) {
+	panic("implement me")
+}
+
 func (m *messageQueueSpy) Shutdown() {
 	panic("implement me")
 }
