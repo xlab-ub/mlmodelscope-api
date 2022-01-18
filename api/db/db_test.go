@@ -107,7 +107,9 @@ func TestCreateAndQueryFrameworks(t *testing.T) {
 
 	assert.Equal(t, 2, len(frameworks))
 	assert.Equal(t, "fw1", frameworks[0].Name)
+	assert.Equal(t, "amd64", frameworks[0].Architectures[0].Name)
 	assert.Equal(t, "fw2", frameworks[1].Name)
+	assert.Equal(t, "amd64", frameworks[1].Architectures[0].Name)
 }
 
 func TestQueryModelById(t *testing.T) {
@@ -125,10 +127,11 @@ func TestQueryModelsByFrameworkId(t *testing.T) {
 	CreateTestDatabase()
 	defer cleanupTestDatabase()
 	createFrameworkNamed("fw1")
+	createFrameworkNamed("fw2")
 	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1})
-	createModelNamed("model2")
+	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2})
 
-	result, _ := testDb.GetModelsForFramework(1)
+	result, _ := testDb.QueryModels(1, "", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model1", result[0].Name)
@@ -141,7 +144,7 @@ func TestQueryModelsByTask(t *testing.T) {
 	createModelNamed("model1")
 	testDb.CreateModel(&models.Model{Name: "model2", Output: models.ModelOutput{Type: "classification"}})
 
-	result, _ := testDb.GetModelsByTask("classification")
+	result, _ := testDb.QueryModels(0, "classification", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model2", result[0].Name)
@@ -152,9 +155,64 @@ func TestQueryModelsByUnknownTask(t *testing.T) {
 	defer cleanupTestDatabase()
 	createModelNamed("model1")
 
-	result, _ := testDb.GetModelsByTask("classification")
+	result, _ := testDb.QueryModels(0, "classification", "")
 
 	assert.Equal(t, 0, len(result))
+}
+
+func TestQueryModelsByArchitecture(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFrameworkNamed("fw1")
+	testDb.CreateFramework(&models.Framework{
+		Name:          "fw2",
+		Architectures: []models.Architecture{
+			models.Architecture{Name: "arm"},
+		},
+	})
+	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1})
+	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2})
+
+	result, _ := testDb.QueryModels(0, "", "arm")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, 1, len(result[0].Framework.Architectures))
+	assert.Equal(t, "arm", result[0].Framework.Architectures[0].Name)
+}
+
+func TestQueryModelsByFrameworkAndTask(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFrameworkNamed("fw1")
+	createFrameworkNamed("fw2")
+	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1, Output: models.ModelOutput{Type: "classification"}})
+	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 1, Output: models.ModelOutput{Type: "segmentation"}})
+	testDb.CreateModel(&models.Model{Name: "model3", FrameworkID: 2, Output: models.ModelOutput{Type: "classification"}})
+
+	result, _ := testDb.QueryModels(1, "classification", "")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "model1", result[0].Name)
+
+	result, _ = testDb.QueryModels(2, "classification", "")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "model3", result[0].Name)
+}
+
+func TestQueryModelsByTaskAndArchitecture(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFramework("fw1", "amd64")
+	createFramework("fw2", "arm")
+	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1, Output: models.ModelOutput{Type: "classification"}})
+	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2, Output: models.ModelOutput{Type: "segmentation"}})
+	testDb.CreateModel(&models.Model{Name: "model3", FrameworkID: 2, Output: models.ModelOutput{Type: "classification"}})
+
+	result, _ := testDb.QueryModels(0, "segmentation", "arm")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "model2", result[0].Name)
 }
 
 func TestQueryFrameworksByNameAndVersion(t *testing.T) {
@@ -168,8 +226,22 @@ func TestQueryFrameworksByNameAndVersion(t *testing.T) {
 	assert.Equal(t, uint(2), result.ID)
 }
 
+func createFramework(name string, architecture string) {
+	testDb.CreateFramework(&models.Framework{
+		Name: name,
+		Architectures: []models.Architecture{
+			models.Architecture{Name: architecture},
+		},
+	})
+}
+
 func createFrameworkNamed(name string) {
-	testDb.CreateFramework(&models.Framework{Name: name})
+	testDb.CreateFramework(&models.Framework{
+		Name: name,
+		Architectures: []models.Architecture{
+			models.Architecture{Name: "amd64"},
+		},
+	})
 }
 
 func cleanupTestDatabase() {

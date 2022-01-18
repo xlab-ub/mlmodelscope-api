@@ -28,6 +28,9 @@ func createTestModelAndFramework() {
 		Framework: &models.Framework{
 			Name:    "PyTorch",
 			Version: "1.0.0",
+			Architectures: []models.Architecture{
+				{Name: "amd64"},
+			},
 		},
 		Input:   models.ModelOutput{},
 		License: "",
