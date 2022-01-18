@@ -54,4 +54,5 @@ var migrators = [](func(*gorm.DB) error){
 	migrations.CreateFrameworksTable,
 	migrations.CreateModelsTable,
 	migrations.CreateTrialsTable,
+	migrations.AddFrameworkArchitectures,
 }
