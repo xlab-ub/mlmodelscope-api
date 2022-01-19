@@ -9,13 +9,13 @@ type Model struct {
 	CreatedAt   time.Time       `json:"-"`
 	UpdatedAt   time.Time       `json:"-"`
 	Attributes  ModelAttributes `gorm:"embedded;embeddedPrefix:attribute_" json:"attributes"`
-	Description string          `json:"description"`
+	Description string          `gorm:"index:idx_models_description,expression:LOWER(description)" json:"description"`
 	Details     ModelDetails    `gorm:"embedded;embeddedPrefix:detail_" json:"model"`
 	Framework   *Framework      `json:"framework"`
 	FrameworkID int             `json:"-"`
 	Input       ModelOutput     `gorm:"embedded;embeddedPrefix:input_" json:"input"`
 	License     string          `json:"license"`
-	Name        string          `json:"name"`
+	Name        string          `gorm:"index:idx_models_name,expression:LOWER(name)" json:"name"`
 	Output      ModelOutput     `gorm:"embedded;embeddedPrefix:output_" json:"output"`
 	Version     string          `json:"version"`
 }
