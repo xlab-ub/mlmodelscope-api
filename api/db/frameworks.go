@@ -22,7 +22,7 @@ func (d *Db) GetAllFrameworks() (frameworks []models.Framework, err error) {
 
 func (d *Db) QueryFrameworks(query *models.Framework) (*models.Framework, error) {
 	var framework models.Framework
-	r := d.database.Joins("Architectures").Where(query).First(&framework)
+	r := d.database.Preload("Architectures").Where(query).First(&framework)
 
 	if r.Error != nil {
 		return nil, nil

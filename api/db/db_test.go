@@ -131,7 +131,7 @@ func TestQueryModelsByFrameworkId(t *testing.T) {
 	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1})
 	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2})
 
-	result, _ := testDb.QueryModels(1, "", "")
+	result, _ := testDb.QueryModels(1, "", "", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model1", result[0].Name)
@@ -144,7 +144,7 @@ func TestQueryModelsByTask(t *testing.T) {
 	createModelNamed("model1")
 	testDb.CreateModel(&models.Model{Name: "model2", Output: models.ModelOutput{Type: "classification"}})
 
-	result, _ := testDb.QueryModels(0, "classification", "")
+	result, _ := testDb.QueryModels(0, "classification", "", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model2", result[0].Name)
@@ -155,7 +155,7 @@ func TestQueryModelsByUnknownTask(t *testing.T) {
 	defer cleanupTestDatabase()
 	createModelNamed("model1")
 
-	result, _ := testDb.QueryModels(0, "classification", "")
+	result, _ := testDb.QueryModels(0, "classification", "", "")
 
 	assert.Equal(t, 0, len(result))
 }
@@ -173,7 +173,7 @@ func TestQueryModelsByArchitecture(t *testing.T) {
 	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1})
 	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2})
 
-	result, _ := testDb.QueryModels(0, "", "arm")
+	result, _ := testDb.QueryModels(0, "", "arm", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, 1, len(result[0].Framework.Architectures))
@@ -189,12 +189,12 @@ func TestQueryModelsByFrameworkAndTask(t *testing.T) {
 	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 1, Output: models.ModelOutput{Type: "segmentation"}})
 	testDb.CreateModel(&models.Model{Name: "model3", FrameworkID: 2, Output: models.ModelOutput{Type: "classification"}})
 
-	result, _ := testDb.QueryModels(1, "classification", "")
+	result, _ := testDb.QueryModels(1, "classification", "", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model1", result[0].Name)
 
-	result, _ = testDb.QueryModels(2, "classification", "")
+	result, _ = testDb.QueryModels(2, "classification", "", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model3", result[0].Name)
@@ -209,10 +209,30 @@ func TestQueryModelsByTaskAndArchitecture(t *testing.T) {
 	testDb.CreateModel(&models.Model{Name: "model2", FrameworkID: 2, Output: models.ModelOutput{Type: "segmentation"}})
 	testDb.CreateModel(&models.Model{Name: "model3", FrameworkID: 2, Output: models.ModelOutput{Type: "classification"}})
 
-	result, _ := testDb.QueryModels(0, "segmentation", "arm")
+	result, _ := testDb.QueryModels(0, "segmentation", "arm", "")
 
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, "model2", result[0].Name)
+}
+
+func TestQueryModelsBySearchString(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFramework("MXNet", "amd64")
+	createFramework("Onnxruntime", "arm")
+	testDb.CreateModel(&models.Model{Name: "AlexNet", FrameworkID: 1, Description: "nothing"})
+	testDb.CreateModel(&models.Model{Name: "Inception_v3", FrameworkID: 2, Description: ""})
+	testDb.CreateModel(&models.Model{Name: "Xception", FrameworkID: 2, Description: "target"})
+
+	result, _ := testDb.QueryModels(0, "", "", "leX")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "AlexNet", result[0].Name)
+
+	result, _ = testDb.QueryModels(0, "", "", "target")
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, uint(3), result[0].ID)
 }
 
 func TestQueryFrameworksByNameAndVersion(t *testing.T) {

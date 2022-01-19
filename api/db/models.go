@@ -2,7 +2,9 @@ package db
 
 import (
 	"api/db/models"
+	"database/sql"
 	"fmt"
+	"strings"
 )
 
 type ModelInteractor interface {
@@ -10,7 +12,7 @@ type ModelInteractor interface {
 	GetAllModels() ([]models.Model, error)
 	GetModelsByTask(string) ([]models.Model, error)
 	GetModelsForFramework(int) ([]models.Model, error)
-	QueryModels(uint, string, string) ([]models.Model, error)
+	QueryModels(uint, string, string, string) ([]models.Model, error)
 }
 
 func (d *Db) CreateModel(m *models.Model) (err error) {
@@ -47,26 +49,30 @@ func (d *Db) GetModelsForFramework(frameworkId int) (m []models.Model, err error
 	return
 }
 
-func (d *Db) QueryModels(frameworkId int, task string, architecture string) (m []models.Model, err error) {
-	where := make(map[string]interface{})
+func (d *Db) QueryModels(frameworkId int, task string, architecture string, query string) (m []models.Model, err error) {
+	db := d.database.
+		Joins("Framework").
+		Preload("Framework.Architectures").
+		Joins("LEFT JOIN architectures ON architectures.framework_id = \"Framework\".id")
 
 	if frameworkId > 0 {
-		where["models.framework_id"] = frameworkId
+		db = db.Where("models.framework_id = ?", frameworkId)
 	}
 
 	if task != "" {
-		where["models.output_type"] = task
+		db = db.Where("models.output_type = ?", task)
 	}
 
 	if architecture != "" {
-		where["architectures.name"] = architecture
+		db = db.Where("architectures.name = ?", architecture)
 	}
 
-	d.database.
-		Joins("Framework").
-		Preload("Framework.Architectures").
-		Joins("LEFT JOIN architectures ON architectures.framework_id = \"Framework\".id").
-		Where(where).
-		Find(&m)
+	if query != "" {
+		wildcard := fmt.Sprintf("%%%s%%", strings.ToLower(query))
+		db = db.Where("LOWER(models.name) LIKE @query OR LOWER(models.description) LIKE @query", sql.Named("query", wildcard))
+	}
+
+	db.Find(&m)
+
 	return
 }

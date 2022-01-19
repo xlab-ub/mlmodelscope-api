@@ -19,9 +19,10 @@ func ListModels(c *gin.Context) {
 	}
 	task := c.Query("task")
 	architecture := c.Query("architecture")
+	query := c.Query("q")
 
 	db, _ := api_db.GetDatabase()
-	m, _ := db.QueryModels(frameworkId, task, architecture)
+	m, _ := db.QueryModels(frameworkId, task, architecture, query)
 
 	c.JSON(200, ModelListResponse{Models: m})
 }

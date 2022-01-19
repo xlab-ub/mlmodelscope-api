@@ -92,4 +92,30 @@ func TestModelRoutes(t *testing.T) {
 
 		assert.Equal(t, 0, len(result.Models))
 	})
+
+	t.Run("SearchByName", func(t *testing.T) {
+		testDb.CreateModel(&models.Model{Name: "AlexNet", Description: "Description"})
+
+		req, _ = http.NewRequest("GET", "/models?q=alex", nil)
+		w:= httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		var result ModelListResponse
+		_ = json.Unmarshal(w.Body.Bytes(), &result)
+
+		assert.Equal(t, 1, len(result.Models))
+		assert.Equal(t, "AlexNet", result.Models[0].Name)
+	})
+
+	t.Run("SearchByDescription", func(t *testing.T) {
+		req, _ = http.NewRequest("GET", "/models?q=descr", nil)
+		w:= httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		var result ModelListResponse
+		_ = json.Unmarshal(w.Body.Bytes(), &result)
+
+		assert.Equal(t, 1, len(result.Models))
+		assert.Equal(t, "AlexNet", result.Models[0].Name)
+	})
 }
