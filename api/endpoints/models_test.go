@@ -26,8 +26,8 @@ func TestModelRoutes(t *testing.T) {
 	})
 
 	t.Run("ListNotEmpty", func(t *testing.T) {
-		testDb.CreateModel(&models.Model{Name: "model1", Framework: &models.Framework{Name: "fw1"}, Output: models.ModelOutput{Type: "test"}})
-		testDb.CreateModel(&models.Model{Name: "model2", Framework: &models.Framework{Name: "fw2"}})
+		testDb.CreateModel(&models.Model{Name: "model1", Framework: &models.Framework{Name: "fw1", Architectures: []models.Architecture{{Name: "amd64"}}}, Output: models.ModelOutput{Type: "classification"}})
+		testDb.CreateModel(&models.Model{Name: "model2", Framework: &models.Framework{Name: "fw2", Architectures: []models.Architecture{{Name: "arm"}}}, Output: models.ModelOutput{Type:"segmentation"}})
 
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
@@ -35,16 +35,18 @@ func TestModelRoutes(t *testing.T) {
 		var result ModelListResponse
 		_ = json.Unmarshal(w.Body.Bytes(), &result)
 
-		assert.Equal(t, "model1", result.Models[0].Name)
 		assert.Equal(t, uint(1), result.Models[0].ID)
+		assert.Equal(t, "model1", result.Models[0].Name)
 		assert.Equal(t, "fw1", result.Models[0].Framework.Name)
-		assert.Equal(t, "model2", result.Models[1].Name)
+		assert.Equal(t, "amd64", result.Models[0].Framework.Architectures[0].Name)
 		assert.Equal(t, uint(2), result.Models[1].ID)
+		assert.Equal(t, "model2", result.Models[1].Name)
 		assert.Equal(t, "fw2", result.Models[1].Framework.Name)
+		assert.Equal(t, "arm", result.Models[1].Framework.Architectures[0].Name)
 	})
 
 	t.Run("ListByFrameworkId", func(t *testing.T) {
-		req, _ = http.NewRequest("GET", "/models/framework/2", nil)
+		req, _ = http.NewRequest("GET", "/models?framework=2", nil)
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 
@@ -57,25 +59,63 @@ func TestModelRoutes(t *testing.T) {
 	})
 
 	t.Run("ListByFrameworkId_BadRequest", func(t *testing.T) {
-		req, _ = http.NewRequest("GET", "/models/framework/x", nil)
+		req, _ = http.NewRequest("GET", "/models?framework=x", nil)
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 400, w.Code)
-		assert.Equal(t, "{\"error\":\"invalid Framework ID: x\"}", w.Body.String())
+		assert.Equal(t, "{\"error\":\"invalid Framework ID\"}", w.Body.String())
 	})
 
 	t.Run("ListByTask", func(t *testing.T) {
-		req, _ = http.NewRequest("GET", "/models/task/test", nil)
+		req, _ = http.NewRequest("GET", "/models?task=classification", nil)
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
 
 		var result ModelListResponse
 		_ = json.Unmarshal(w.Body.Bytes(), &result)
 
+		assert.Equal(t, 1, len(result.Models))
 		assert.Equal(t, uint(1), result.Models[0].ID)
 		assert.Equal(t, "model1", result.Models[0].Name)
 		assert.Equal(t, "fw1", result.Models[0].Framework.Name)
-		assert.Equal(t, "test", result.Models[0].Output.Type)
+		assert.Equal(t, "classification", result.Models[0].Output.Type)
+	})
+
+	t.Run("ListByTaskAndArchitecture", func(t *testing.T) {
+		req, _ = http.NewRequest("GET", "/models?task=segmentation&architecture=amd64", nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		var result ModelListResponse
+		_ = json.Unmarshal(w.Body.Bytes(), &result)
+
+		assert.Equal(t, 0, len(result.Models))
+	})
+
+	t.Run("SearchByName", func(t *testing.T) {
+		testDb.CreateModel(&models.Model{Name: "AlexNet", Description: "Description"})
+
+		req, _ = http.NewRequest("GET", "/models?q=alex", nil)
+		w:= httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		var result ModelListResponse
+		_ = json.Unmarshal(w.Body.Bytes(), &result)
+
+		assert.Equal(t, 1, len(result.Models))
+		assert.Equal(t, "AlexNet", result.Models[0].Name)
+	})
+
+	t.Run("SearchByDescription", func(t *testing.T) {
+		req, _ = http.NewRequest("GET", "/models?q=descr", nil)
+		w:= httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		var result ModelListResponse
+		_ = json.Unmarshal(w.Body.Bytes(), &result)
+
+		assert.Equal(t, 1, len(result.Models))
+		assert.Equal(t, "AlexNet", result.Models[0].Name)
 	})
 }

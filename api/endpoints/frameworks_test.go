@@ -26,8 +26,8 @@ func TestFrameworkRoutes(t *testing.T) {
 	})
 
 	t.Run("ListNotEmpty", func(t *testing.T) {
-		testDb.CreateFramework(&models.Framework{Name: "fw1"})
-		testDb.CreateFramework(&models.Framework{Name: "fw2"})
+		testDb.CreateFramework(&models.Framework{Name: "fw1", Architectures: []models.Architecture{{Name: "amd64"}}})
+		testDb.CreateFramework(&models.Framework{Name: "fw2", Architectures: []models.Architecture{{Name: "arm"}}})
 
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, req)
@@ -35,9 +35,11 @@ func TestFrameworkRoutes(t *testing.T) {
 		var result ListFrameworksResponse
 		_ = json.Unmarshal(w.Body.Bytes(), &result)
 
-		assert.Equal(t, "fw1", result.Frameworks[0].Name)
 		assert.Equal(t, uint(1), result.Frameworks[0].ID)
-		assert.Equal(t, "fw2", result.Frameworks[1].Name)
+		assert.Equal(t, "fw1", result.Frameworks[0].Name)
+		assert.Equal(t, "amd64", result.Frameworks[0].Architectures[0].Name)
 		assert.Equal(t, uint(2), result.Frameworks[1].ID)
+		assert.Equal(t, "fw2", result.Frameworks[1].Name)
+		assert.Equal(t, "arm", result.Frameworks[1].Architectures[0].Name)
 	})
 }

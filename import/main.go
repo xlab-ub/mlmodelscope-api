@@ -49,6 +49,13 @@ func main() {
 		if f, _ := database.QueryFrameworks(&models.Framework{Name: model.Framework.Name, Version: model.Framework.Version}); f != nil {
 			model.Framework = nil
 			model.FrameworkID = int(f.ID)
+		} else {
+			model.Framework.Architectures = []models.Architecture{
+				{
+					Name:        "amd64",
+					FrameworkID: model.Framework.ID,
+				},
+			}
 		}
 
 		err = database.CreateModel(&model)

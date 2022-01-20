@@ -9,8 +9,6 @@ func SetupRoutes() *gin.Engine {
 	models := r.Group("/models")
 	{
 		models.GET("", ListModels)
-		models.GET("/framework/:id", ListModelsByFrameworkId)
-		models.GET("/task/:task", ListModelsByTask)
 	}
 	r.POST("/predict", Predict)
 	trial := r.Group("/trial")
