@@ -15,18 +15,13 @@ func (d *Db) CreateFramework(f *models.Framework) (err error) {
 }
 
 func (d *Db) GetAllFrameworks() (frameworks []models.Framework, err error) {
-	d.database.Preload("Architectures").Find(&frameworks)
+	err = d.database.Preload("Architectures").Find(&frameworks).Error
 
 	return
 }
 
-func (d *Db) QueryFrameworks(query *models.Framework) (*models.Framework, error) {
-	var framework models.Framework
-	r := d.database.Preload("Architectures").Where(query).First(&framework)
+func (d *Db) QueryFrameworks(query *models.Framework) (framework *models.Framework, err error) {
+	err = d.database.Preload("Architectures").Where(query).First(&framework).Error
 
-	if r.Error != nil {
-		return nil, nil
-	}
-
-	return &framework, nil
+	return
 }

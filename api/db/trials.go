@@ -29,23 +29,21 @@ func (d *Db) CreateTrial(trial *models.Trial) (err error) {
 		return fmt.Errorf("attempt to create Trial without an associated Model")
 	}
 
-	d.database.Create(trial)
-
-	return d.database.Error
+	return d.database.Create(trial).Error
 }
 
 func (d *Db) GetAllTrials() (trials []models.Trial, err error) {
-	d.database.Preload("Inputs").Joins("Model").Find(&trials)
+	err = d.database.Preload("Inputs").Joins("Model").Find(&trials).Error
 
-	return trials, d.database.Error
+	return
 }
 
 func (d *Db) GetTrialById(id string) (trial *models.Trial, err error) {
-	d.database.Preload("Inputs").Joins("Model").First(&trial, "trials.id = ?", id)
+	err = d.database.Preload("Inputs").Joins("Model").First(&trial, "trials.id = ?", id).Error
 
-	if trial.ID == "" {
-		return nil, fmt.Errorf("unknown Trial: %s", id)
+	if err != nil {
+		err = fmt.Errorf("unknown Trial: %s", id)
 	}
 
-	return trial, d.database.Error
+	return
 }

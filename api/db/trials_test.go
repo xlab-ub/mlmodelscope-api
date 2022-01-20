@@ -83,10 +83,9 @@ func TestTrialInteractor(t *testing.T) {
 	})
 
 	t.Run("QueryMissingTrialById", func(t *testing.T) {
-		trial, err := testDb.GetTrialById("trial3")
+		_, err := testDb.GetTrialById("trial3")
 
 		assert.NotNil(t, err)
-		assert.Nil(t, trial)
 		assert.Equal(t, "unknown Trial: trial3", err.Error())
 	})
 
