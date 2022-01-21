@@ -6,15 +6,17 @@ import (
 )
 
 type Trial struct {
-	ID          string `gorm:"primaryKey" json:"id"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time      `json:"-"`
-	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
-	CompletedAt *time.Time
-	Model       *Model       `json:"model"`
-	ModelID     uint         `json:"-"`
-	Inputs      []TrialInput `json:"inputs"`
-	Result      string       `json:"result"`
+	ID           string         `gorm:"primaryKey" json:"id"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time      `json:"-"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	CompletedAt  *time.Time
+	Experiment   *Experiment    `json:"experiment"`
+	ExperimentID string         `json:"-"`
+	Model        *Model         `json:"model"`
+	ModelID      uint           `json:"-"`
+	Inputs       []TrialInput   `json:"inputs"`
+	Result       string         `json:"result"`
 }
 
 type TrialInput struct {
