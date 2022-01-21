@@ -29,6 +29,10 @@ func (d *Db) CreateTrial(trial *models.Trial) (err error) {
 		return fmt.Errorf("attempt to create Trial without an associated Model")
 	}
 
+	if trial.ExperimentID == "" {
+		return fmt.Errorf("attempt to create Trial without an associated Experiment")
+	}
+
 	return d.database.Create(trial).Error
 }
 
@@ -39,7 +43,7 @@ func (d *Db) GetAllTrials() (trials []models.Trial, err error) {
 }
 
 func (d *Db) GetTrialById(id string) (trial *models.Trial, err error) {
-	err = d.database.Preload("Inputs").Joins("Model").First(&trial, "trials.id = ?", id).Error
+	err = d.database.Preload("Inputs").Joins("Experiment").Joins("Model").First(&trial, "trials.id = ?", id).Error
 
 	if err != nil {
 		err = fmt.Errorf("unknown Trial: %s", id)

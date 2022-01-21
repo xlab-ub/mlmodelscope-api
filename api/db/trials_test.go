@@ -14,6 +14,7 @@ func TestTrialInteractor(t *testing.T) {
 	defer cleanupTestDatabase()
 
 	createModelNamed("TestModel")
+	testDb.CreateExperiment(&models.Experiment{ID: "experiment1"})
 
 	t.Run("CannotCreateTrialWithEmptyId", func(t *testing.T) {
 		trial := models.Trial{}
@@ -33,10 +34,22 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Equal(t, "attempt to create Trial without an associated Model", err.Error())
 	})
 
+	t.Run("CannotCreateTrialWithoutExperiment", func(t *testing.T) {
+		trial := models.Trial{
+			ID: "trial1",
+			ModelID: 1,
+		}
+		err := testDb.CreateTrial(&trial)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, "attempt to create Trial without an associated Experiment", err.Error())
+	})
+
 	t.Run("CreateAndQueryTrial", func(t *testing.T) {
 		trial := models.Trial{
 			ID:      "trial1",
 			ModelID: 1,
+			ExperimentID: "experiment1",
 		}
 		err := testDb.CreateTrial(&trial)
 
@@ -48,6 +61,7 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Equal(t, 1, len(trials))
 		assert.Equal(t, "trial1", trials[0].ID)
 		assert.Equal(t, uint(1), trials[0].Model.ID)
+		assert.Equal(t, "experiment1", trials[0].ExperimentID)
 		assert.Nil(t, trials[0].CompletedAt)
 		assert.Equal(t, "", trials[0].Result)
 	})
@@ -61,6 +75,7 @@ func TestTrialInteractor(t *testing.T) {
 				},
 			},
 			ModelID: 1,
+			ExperimentID: "experiment1",
 		}
 		err := testDb.CreateTrial(&trial)
 
@@ -100,5 +115,13 @@ func TestTrialInteractor(t *testing.T) {
 		assert.NotNil(t, complete.CompletedAt)
 		assert.NotEqual(t, time.Time{}, complete.CompletedAt)
 		assert.Equal(t, "trial_results", complete.Result)
+	})
+
+	t.Run("CreateAndQueryTrialWithExperiment", func(t *testing.T) {
+		testDb.CreateTrial(&models.Trial{ID: "trial4", ExperimentID: "experiment1", ModelID: 1})
+
+		trial, _ := testDb.GetTrialById("trial4")
+
+		assert.Equal(t, "experiment1", trial.Experiment.ID)
 	})
 }
