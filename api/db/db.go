@@ -29,6 +29,7 @@ var (
 )
 
 type Db struct {
+	ExperimentInteractor
 	FrameworkInteractor
 	ModelInteractor
 	TrialInteractor
