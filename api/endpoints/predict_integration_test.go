@@ -104,7 +104,6 @@ func TestPredictEndpoint(t *testing.T) {
 		db, _ := api_db.GetDatabase()
 		channel, _ := messageQueue.SubscribeToChannel("API")
 
-		//router := SetupRoutes()
 		requestBody := validPredictRequestBody()
 		// Predictions for model ID 2 should be processed by the mock agent
 		requestBody.Model = 2
@@ -123,7 +122,7 @@ func TestPredictEndpoint(t *testing.T) {
 
 		trial, _ := db.GetTrialById(message.CorrelationId)
 		assert.NotNil(t, trial)
-		assert.Equal(t, response.ExperimentId, trial.ID)
+		assert.Equal(t, response.TrialId, trial.ID)
 	})
 
 	t.Run("StatusTrackerCompletesTrial", func(t *testing.T) {
@@ -142,7 +141,7 @@ func TestPredictEndpoint(t *testing.T) {
 
 		time.Sleep(time.Millisecond * 100)
 
-		trial, err := db.GetTrialById(response.ExperimentId)
+		trial, err := db.GetTrialById(response.TrialId)
 		assert.Nil(t, err)
 		assert.NotNil(t, trial)
 		assert.NotEqual(t, "", trial.Result)
@@ -150,10 +149,6 @@ func TestPredictEndpoint(t *testing.T) {
 		trackerDone <- true
 	})
 }
-
-//func TestPredictEndpointAgentRoundTrip(t *testing.T) {
-//	setupForIntegrationTest()
-//}
 
 type mockPredictionResponse struct {
 	Id string `json:"id"`

@@ -12,6 +12,7 @@ import (
 func TestTrialRoute(t *testing.T) {
 	openDatabase()
 	createTestModelAndFramework()
+	createTestExperiment()
 	defer cleanupTestDatabase()
 	router := SetupRoutes()
 
@@ -33,9 +34,10 @@ func TestTrialRoute(t *testing.T) {
 
 	t.Run("GetIncompleteTrial", func(t *testing.T) {
 		testDb.CreateTrial(&models.Trial{
-			ID:          "trial1",
-			ModelID:     1,
-			Inputs:      []models.TrialInput{
+			ID:           "trial1",
+			ModelID:      1,
+			ExperimentID: "test",
+			Inputs:       []models.TrialInput{
 				models.TrialInput{
 					URL: "test_url",
 				},
@@ -58,9 +60,10 @@ func TestTrialRoute(t *testing.T) {
 
 	t.Run("GetCompletedTrial", func(t *testing.T) {
 		testDb.CreateTrial(&models.Trial{
-			ID:          "trial2",
-			ModelID:     1,
-			Inputs:      []models.TrialInput{
+			ID:           "trial2",
+			ModelID:      1,
+			ExperimentID: "test",
+			Inputs:       []models.TrialInput{
 				models.TrialInput{
 					URL: "test_url",
 				},
