@@ -16,6 +16,7 @@ func SetupRoutes() *gin.Engine {
 	models := r.Group("/models")
 	{
 		models.GET("", ListModels)
+		models.GET("/:model_id", GetModelById)
 	}
 	r.POST("/predict", Predict)
 
