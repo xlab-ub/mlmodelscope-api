@@ -56,4 +56,5 @@ var migrators = [](func(*gorm.DB) error){
 	migrations.CreateTrialsTable,
 	migrations.AddFrameworkArchitectures,
 	migrations.AddSearchIndices,
+	migrations.CreateExperimentsTable,
 }

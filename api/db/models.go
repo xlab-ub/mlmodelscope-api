@@ -16,35 +16,33 @@ type ModelInteractor interface {
 }
 
 func (d *Db) CreateModel(m *models.Model) (err error) {
-	d.database.Create(m)
-
-	return
+	return d.database.Create(m).Error
 }
 
 func (d *Db) GetAllModels() (m []models.Model, err error) {
-	d.database.Joins("Framework").Find(&m)
+	err = d.database.Joins("Framework").Find(&m).Error
 
 	return
 }
 
 func (d *Db) GetModelById(id uint) (m *models.Model, err error) {
-	d.database.Joins("Framework").First(&m, id)
+	err = d.database.Joins("Framework").First(&m, id).Error
 
-	if m.ID != id {
-		return nil, fmt.Errorf("Unknown Model Id: %d", id)
+	if err != nil {
+		err = fmt.Errorf("Unknown Model Id: %d", id)
 	}
 
 	return
 }
 
 func (d *Db) GetModelsByTask(task string) (m []models.Model, err error) {
-	d.database.Where(&models.Model{Output: models.ModelOutput{Type: task}}).Joins("Framework").Find(&m)
+	err = d.database.Where(&models.Model{Output: models.ModelOutput{Type: task}}).Joins("Framework").Find(&m).Error
 
 	return
 }
 
 func (d *Db) GetModelsForFramework(frameworkId int) (m []models.Model, err error) {
-	d.database.Where(&models.Model{FrameworkID: frameworkId}).Joins("Framework").Find(&m)
+	err = d.database.Where(&models.Model{FrameworkID: frameworkId}).Joins("Framework").Find(&m).Error
 
 	return
 }
@@ -72,7 +70,7 @@ func (d *Db) QueryModels(frameworkId int, task string, architecture string, quer
 		db = db.Where("LOWER(models.name) LIKE @query OR LOWER(models.description) LIKE @query", sql.Named("query", wildcard))
 	}
 
-	db.Find(&m)
+	err = db.Find(&m).Error
 
 	return
 }

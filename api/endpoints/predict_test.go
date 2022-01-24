@@ -6,6 +6,7 @@ import (
 	"api/api_mq"
 	"encoding/json"
 	"github.com/c3sr/mq/messages"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -19,6 +20,7 @@ func TestPredictRoute(t *testing.T) {
 	createTestModelAndFramework()
 	defer cleanupTestDatabase()
 	router := SetupRoutes()
+	experimentId := ""
 
 	t.Run("RequiresContentType", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -137,11 +139,7 @@ func TestPredictRoute(t *testing.T) {
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
 
-		res := predictResponseBody{}
-		json.Unmarshal(w.Body.Bytes(), &res)
-
 		assert.Equal(t, 200, w.Code)
-		assert.Equal(t, "", res.ExperimentId)
 	})
 
 	t.Run("SendsMessageToAgentQueue", func(t *testing.T) {
@@ -159,7 +157,7 @@ func TestPredictRoute(t *testing.T) {
 		assert.Equal(t, "test_model_1.0", message.ModelName)
 	})
 
-	t.Run("CreatesTrial", func(t *testing.T) {
+	t.Run("CreatesExperimentAndTrial", func(t *testing.T) {
 		spy := &messageQueueSpy{
 			correlationId: "trial1",
 		}
@@ -168,12 +166,44 @@ func TestPredictRoute(t *testing.T) {
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
+		response := predictResponseBody{}
+		json.Unmarshal(w.Body.Bytes(), &response)
 
 		trial, _ := testDb.GetTrialById("trial1")
 
 		assert.NotNil(t, trial)
+		experimentId = trial.ExperimentID
+		_, err := uuid.Parse(experimentId)
+		assert.Nil(t, err)
+		assert.Equal(t, experimentId, response.ExperimentId)
+		assert.Equal(t, "trial1", response.TrialId)
+		assert.NotNil(t, trial.Experiment)
 		assert.Equal(t, uint(1), trial.ModelID)
 		assert.Equal(t, 1, len(trial.Inputs))
 		assert.Equal(t, "input_url", trial.Inputs[0].URL)
+	})
+
+	t.Run("AddsTrialToExistingExperiment", func(t *testing.T) {
+		spy := &messageQueueSpy{correlationId: "trial2"}
+		api_mq.SetMessageQueue(spy)
+		requestBody := validPredictRequestBody()
+		requestBody.Experiment = experimentId
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+		response := predictResponseBody{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+
+		assert.Equal(t, experimentId, response.ExperimentId)
+		assert.Equal(t, "trial2", response.TrialId)
+
+		trial, _ := testDb.GetTrialById("trial2")
+
+		assert.NotNil(t, trial)
+		assert.Equal(t, experimentId, trial.ExperimentID)
+
+		experiment, _ := testDb.GetExperimentById(trial.ExperimentID)
+		assert.NotNil(t, experiment)
+		assert.Equal(t, 2, len(experiment.Trials))
 	})
 }

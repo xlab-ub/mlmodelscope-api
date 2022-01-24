@@ -35,5 +35,29 @@ func getFrameworkId(c *gin.Context) (frameworkId int, err error) {
 	}
 
 	frameworkId, err = strconv.Atoi(framework)
-	return frameworkId, err
+	return
+}
+
+func GetModelById(c *gin.Context) {
+	modelId, err := getModelId(c)
+	if err != nil {
+		c.JSON(400, &ErrorResponse{Error: "invalid Model ID"})
+		return
+	}
+
+	db, _ := api_db.GetDatabase()
+	m, _ := db.GetModelById(uint(modelId))
+
+	c.JSON(200, ModelListResponse{Models: []models.Model{ *m }})
+}
+
+func getModelId(c *gin.Context) (modelId int, err error) {
+	model := c.Param("model_id")
+
+	if model == "" {
+		return
+	}
+
+	modelId, err = strconv.Atoi(model)
+	return
 }

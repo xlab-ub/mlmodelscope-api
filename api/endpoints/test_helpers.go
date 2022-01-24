@@ -40,6 +40,10 @@ func createTestModelAndFramework() {
 	})
 }
 
+func createTestExperiment() {
+	testDb.CreateExperiment(&models.Experiment{ID: "test"})
+}
+
 func cleanupTestDatabase() {
 	api_db.CloseDatabase()
 	os.Remove("models_test.sqlite")

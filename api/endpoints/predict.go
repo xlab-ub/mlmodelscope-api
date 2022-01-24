@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/c3sr/mq/messages"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"strings"
 )
 
@@ -18,10 +19,12 @@ type predictRequestBody struct {
 	Inputs                []string `json:"inputs,omitempty" binding:"required"`
 	Model                 uint     `json:"model,omitempty" binding:"required"`
 	TraceLevel            string   `json:"traceLevel,omitempty" binding:"required"`
+	Experiment            string   `json:"experiment,omitempty"`
 }
 
 type predictResponseBody struct {
 	ExperimentId string `json:"experimentId,omitempty"`
+	TrialId      string `json:"trialId,omitempty"`
 }
 
 func Predict(c *gin.Context) {
@@ -53,13 +56,20 @@ func Predict(c *gin.Context) {
 		})
 	}
 
+	var experimentId string
+	if experimentId = requestBody.Experiment; experimentId == "" {
+		experimentId = uuid.New().String()
+		db.CreateExperiment(&models.Experiment{ID: experimentId})
+	}
+
 	db.CreateTrial(&models.Trial{
 		ID:      correlationId,
+		ExperimentID: experimentId,
 		ModelID: model.ID,
 		Inputs:  inputs,
 	})
 
-	c.JSON(200, &predictResponseBody{ExperimentId: correlationId})
+	c.JSON(200, &predictResponseBody{ExperimentId: experimentId, TrialId: correlationId})
 }
 
 func makePredictMessage(request *predictRequestBody, model *models.Model) *messages.PredictByModelName {
