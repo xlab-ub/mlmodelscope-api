@@ -46,7 +46,7 @@ func main() {
 	}
 
 	for _, model := range m.Manifests {
-		if f, _ := database.QueryFrameworks(&models.Framework{Name: model.Framework.Name, Version: model.Framework.Version}); f != nil {
+		if f, err := database.QueryFrameworks(&models.Framework{Name: model.Framework.Name, Version: model.Framework.Version}); err == nil {
 			model.Framework = nil
 			model.FrameworkID = int(f.ID)
 		} else {
