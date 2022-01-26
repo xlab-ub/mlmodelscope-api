@@ -3,6 +3,7 @@ package db
 import (
 	"api/db/migrations"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -11,9 +12,11 @@ type Migrator interface {
 }
 
 func (d *Db) Migrate() (err error) {
+	log.Println("[INFO] running database migrations")
 	nextMigration := lookupNextMigration(d)
 
 	for index, migrator := range migrators[nextMigration:] {
+		log.Printf("[INFO] running migration %d", nextMigration + index)
 		err = migrator(d.database)
 
 		if err != nil {
