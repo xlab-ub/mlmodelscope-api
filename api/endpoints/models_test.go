@@ -22,7 +22,7 @@ func TestModelRoutes(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, 200, w.Code)
-		assert.Equal(t, "{}", w.Body.String())
+		assert.Equal(t, "{\"models\":[]}", w.Body.String())
 	})
 
 	t.Run("ListNotEmpty", func(t *testing.T) {

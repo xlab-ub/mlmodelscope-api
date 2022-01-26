@@ -8,7 +8,7 @@ import (
 )
 
 type ModelListResponse struct {
-	Models []models.Model `json:"models,omitempty"`
+	Models []models.Model `json:"models"`
 }
 
 func ListModels(c *gin.Context) {
