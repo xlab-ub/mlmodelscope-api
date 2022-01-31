@@ -31,10 +31,18 @@ services:
       - "14268:14268"
       - "9411:9411"
 
-  uploader:
-    image: "$DOCKER_REGISTRY/mlmodelscope-uploader:$UPLOADER_VERSION"
-    ports:
-      - "8089:80"
+  companion:
+    image: transloadit/companion:sha-a74ae35
+    environment:
+      COMPANION_AWS_KEY: "$AWS_ACCESS_KEY_ID"
+      COMPANION_AWS_SECRET: "$AWS_SECRET_ACCESS_KEY"
+      COMPANION_AWS_BUCKET: "$UPLOAD_BUCKET"
+      COMPANION_AWS_REGION: "$UPLOAD_BUCKET_REGION"
+      COMPANION_DOMAIN: "http://companion.${ENVIRONMENT}mlmodelscope.org"
+      COMPANION_DATADIR: "/data"
+
+    volumes:
+      - /tmp/companion_data:/data
 
   mq:
     image: rabbitmq:3-management-alpine

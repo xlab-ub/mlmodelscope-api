@@ -12,10 +12,6 @@ services:
     ports:
       - "8080:8080"
 
-  uploader:
-    build:
-      context: ./uploader/
-      dockerfile: ../docker/Dockerfile.uploader
 
   db:
     image: postgres:14.1
