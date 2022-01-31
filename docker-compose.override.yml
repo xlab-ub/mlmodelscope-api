@@ -8,10 +8,46 @@ services:
     depends_on:
       - db
       - mq
+      - traefik
 
-    ports:
-      - "8080:8080"
+    networks:
+      - default
+      - traefik
 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.local.mlmodelscope.org`)"
+      - "traefik.http.routers.mlmodelscope-api.entrypoints=web"
+      - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT"
+      - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=http://www.local.mlmodelscope.org,http://localhost:3000"
+      - "traefik.http.middlewares.add-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.add-cors.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id"
+      - "traefik.http.middlewares.add-cors.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.add-cors.headers.addvaryheader=true"
+      - "traefik.http.routers.mlmodelscope-api.middlewares=add-cors"
+
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+  companion:
+    depends_on:
+      - traefik
+
+    networks:
+      - default
+      - traefik
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.local.mlmodelscope.org`)"
+      - "traefik.http.routers.mlmodelscope-companion.entrypoints=web"
+      - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
+      - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors"
 
   db:
     image: postgres:14.1
@@ -23,6 +59,25 @@ services:
 
     volumes:
       - ./docker/data:/docker-entrypoint-initdb.d/
+
+  traefik:
+    image: traefik:v2.5
+    command:
+      - "--api.insecure=true"
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+
+    ports:
+      - "80:80"
+      - "8080:8080"
+
+    networks:
+      - traefik
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:
   traefik:
