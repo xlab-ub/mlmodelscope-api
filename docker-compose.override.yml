@@ -20,8 +20,8 @@ services:
       - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.local.mlmodelscope.org`)"
       - "traefik.http.routers.mlmodelscope-api.entrypoints=web"
       - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT"
-      - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=http://www.local.mlmodelscope.org,http://localhost:3000"
+      - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,POST,PUT"
+      - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=http://local.mlmodelscope.org"
       - "traefik.http.middlewares.add-cors.headers.accessControlAllowCredentials=true"
       - "traefik.http.middlewares.add-cors.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id"
       - "traefik.http.middlewares.add-cors.headers.accesscontrolmaxage=100"
@@ -34,6 +34,9 @@ services:
         delay: 10s
 
   companion:
+    env_file:
+      - .env.companion
+
     depends_on:
       - traefik
 
@@ -47,7 +50,13 @@ services:
       - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.local.mlmodelscope.org`)"
       - "traefik.http.routers.mlmodelscope-companion.entrypoints=web"
       - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
-      - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors"
+      - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowMethods=GET,OPTIONS,POST"
+      - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolalloworiginlist=http://local.mlmodelscope.org"
+      - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowHeaders=origin,content-type,accept,uppy-versions"
+      - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.add-cors-companion.headers.addvaryheader=true"
+      - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors-companion"
 
   db:
     image: postgres:14.1
@@ -65,6 +74,7 @@ services:
     command:
       - "--api.insecure=true"
       - "--log.level=DEBUG"
+      - "--providers.file.filename=/root/mlmodelscope-www.yml"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -77,6 +87,7 @@ services:
       - traefik
 
     volumes:
+      - ./docker/mlmodelscope-www.yml:/root/mlmodelscope-www.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:

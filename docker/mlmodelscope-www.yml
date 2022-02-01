@@ -1,0 +1,13 @@
+http:
+  services:
+    mlmodelscope-www:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3000/"
+
+  routers:
+    mlmodelscope-www:
+      entryPoints:
+        - "web"
+      rule: "Host(`local.mlmodelscope.org`)"
+      service: mlmodelscope-www

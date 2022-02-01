@@ -33,7 +33,19 @@ services:
         - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.${ENVIRONMENT}mlmodelscope.org`)"
         - "traefik.http.routers.mlmodelscope-companion.entrypoints=web"
         - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
-        - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors"
+        - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowMethods=GET,OPTIONS,POST"
+        - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolalloworiginlist=https://staging.mlmodelscope.org"
+        - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowCredentials=true"
+        - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowHeaders=origin,content-type,accept,uppy-versions"
+        - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolmaxage=100"
+        - "traefik.http.middlewares.add-cors-companion.headers.addvaryheader=true"
+        - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors-companion"
+
+    environment:
+      COMPANION_AWS_KEY: "$COMPANION_AWS_KEY"
+      COMPANION_AWS_SECRET: "$COMPANION_AWS_SECRET"
+      COMPANION_BUCKET: "$COMPANION_BUCKET"
+      COMPANION_AWS_REGION: "$COMPANION_AWS_REGION"
 
   mq:
     networks:
