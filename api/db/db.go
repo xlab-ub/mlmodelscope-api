@@ -33,6 +33,7 @@ type Db struct {
 	FrameworkInteractor
 	ModelInteractor
 	TrialInteractor
+	UserInteractor
 	Migrator
 
 	database *gorm.DB
