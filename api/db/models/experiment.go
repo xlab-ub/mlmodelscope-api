@@ -11,4 +11,6 @@ type Experiment struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Trials    []Trial        `json:"trials"`
+	User      *User          `json:"-"`
+	UserID    string         `json:"user_id"`
 }
