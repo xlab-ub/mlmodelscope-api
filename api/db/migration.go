@@ -16,7 +16,7 @@ func (d *Db) Migrate() (err error) {
 	nextMigration := lookupNextMigration(d)
 
 	for index, migrator := range migrators[nextMigration:] {
-		log.Printf("[INFO] running migration %d", nextMigration + index)
+		log.Printf("[INFO] running migration %d", nextMigration+index)
 		err = migrator(d.database)
 
 		if err != nil {
@@ -60,4 +60,5 @@ var migrators = [](func(*gorm.DB) error){
 	migrations.AddFrameworkArchitectures,
 	migrations.AddSearchIndices,
 	migrations.CreateExperimentsTable,
+	migrations.CreateUsersTable,
 }
