@@ -26,6 +26,7 @@ func setupForIntegrationTest() {
 	trackerDone = make(chan bool)
 	db, _ := api_db.GetDatabase()
 	db.Migrate()
+	db.CreateUser(&models.User{ID: "anonymous"})
 	db.CreateModel(&models.Model{
 		Attributes:  models.ModelAttributes{},
 		Description: "for integration test",
@@ -123,6 +124,7 @@ func TestPredictEndpoint(t *testing.T) {
 		trial, _ := db.GetTrialById(message.CorrelationId)
 		assert.NotNil(t, trial)
 		assert.Equal(t, response.TrialId, trial.ID)
+		assert.Equal(t, "anonymous", trial.Inputs[0].UserID)
 	})
 
 	t.Run("StatusTrackerCompletesTrial", func(t *testing.T) {
