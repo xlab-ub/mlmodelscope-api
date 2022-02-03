@@ -41,7 +41,8 @@ func createTestModelAndFramework() {
 }
 
 func createTestExperiment() {
-	testDb.CreateExperiment(&models.Experiment{ID: "test"})
+	testDb.CreateUser(&models.User{ID: "experimentTestUser"})
+	testDb.CreateExperiment(&models.Experiment{ID: "test", UserID: "experimentTestUser"})
 }
 
 func cleanupTestDatabase() {

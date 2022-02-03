@@ -28,6 +28,7 @@ type predictResponseBody struct {
 }
 
 func Predict(c *gin.Context) {
+	userId := "anonymous"
 	requestBody := &predictRequestBody{}
 	err := c.Bind(requestBody)
 	if err != nil {
@@ -59,14 +60,14 @@ func Predict(c *gin.Context) {
 	var experimentId string
 	if experimentId = requestBody.Experiment; experimentId == "" {
 		experimentId = uuid.New().String()
-		db.CreateExperiment(&models.Experiment{ID: experimentId})
+		db.CreateExperiment(&models.Experiment{ID: experimentId, UserID: userId})
 	}
 
 	db.CreateTrial(&models.Trial{
-		ID:      correlationId,
+		ID:           correlationId,
 		ExperimentID: experimentId,
-		ModelID: model.ID,
-		Inputs:  inputs,
+		ModelID:      model.ID,
+		Inputs:       inputs,
 	})
 
 	c.JSON(200, &predictResponseBody{ExperimentId: experimentId, TrialId: correlationId})
