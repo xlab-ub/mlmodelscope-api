@@ -26,7 +26,6 @@ func setupForIntegrationTest() {
 	trackerDone = make(chan bool)
 	db, _ := api_db.GetDatabase()
 	db.Migrate()
-	db.CreateUser(&models.User{ID: "anonymous"})
 	db.CreateModel(&models.Model{
 		Attributes:  models.ModelAttributes{},
 		Description: "for integration test",
