@@ -53,7 +53,8 @@ func Predict(c *gin.Context) {
 	var inputs []models.TrialInput
 	for _, input := range requestBody.Inputs {
 		inputs = append(inputs, models.TrialInput{
-			URL: input,
+			URL:    input,
+			UserID: userId,
 		})
 	}
 

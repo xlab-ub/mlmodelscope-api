@@ -72,7 +72,8 @@ func TestTrialInteractor(t *testing.T) {
 			ID: "trial2",
 			Inputs: []models.TrialInput{
 				models.TrialInput{
-					URL: "testURL",
+					URL:    "testURL",
+					UserID: "testUser",
 				},
 			},
 			ModelID:      1,
@@ -87,6 +88,7 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "trial2", trials[1].ID)
 		assert.Equal(t, 1, len(trials[1].Inputs))
+		assert.Equal(t, "testUser", trials[1].Inputs[0].UserID)
 	})
 
 	t.Run("QueryTrialById", func(t *testing.T) {
