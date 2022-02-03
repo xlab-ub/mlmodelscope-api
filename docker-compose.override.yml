@@ -66,6 +66,9 @@ services:
       POSTGRES_PASSWORD: "$DB_PASSWORD"
       POSTGRES_DB: "$DB_DBNAME"
 
+    ports:
+      - "15432:5432"
+
     volumes:
       - ./docker/data:/docker-entrypoint-initdb.d/
 
