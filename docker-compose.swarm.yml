@@ -48,6 +48,9 @@ services:
       COMPANION_AWS_REGION: "$COMPANION_AWS_REGION"
       COMPANION_DOMAIN: "https://companion.${ENVIRONMENT}mlmodelscope.org"
 
+    volumes:
+      - staging-companion-data:/data
+
   mq:
     networks:
       - default
@@ -71,3 +74,4 @@ networks:
 volumes:
   staging-rabbit-efs:
     external: true
+  staging-companion-data:
