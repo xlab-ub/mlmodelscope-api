@@ -23,4 +23,6 @@ type TrialInput struct {
 	gorm.Model
 	TrialID string `json:"-"`
 	URL     string `json:"url"`
+	User    *User  `json:"-"`
+	UserID  string `json:"user_id"`
 }

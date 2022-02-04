@@ -15,6 +15,10 @@ func (d *Db) CreateExperiment(experiment *models.Experiment) error {
 		return errors.New("attempt to create Experiment without ID")
 	}
 
+	if experiment.UserID == "" {
+		return errors.New("attempt to create Experiment without User")
+	}
+
 	return d.database.Create(experiment).Error
 }
 

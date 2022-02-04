@@ -157,7 +157,7 @@ func TestPredictRoute(t *testing.T) {
 		assert.Equal(t, "test_model_1.0", message.ModelName)
 	})
 
-	t.Run("CreatesExperimentAndTrial", func(t *testing.T) {
+	t.Run("CreatesExperimentAndTrialWithAnonymousUser", func(t *testing.T) {
 		spy := &messageQueueSpy{
 			correlationId: "trial1",
 		}
@@ -181,6 +181,7 @@ func TestPredictRoute(t *testing.T) {
 		assert.Equal(t, uint(1), trial.ModelID)
 		assert.Equal(t, 1, len(trial.Inputs))
 		assert.Equal(t, "input_url", trial.Inputs[0].URL)
+		assert.Equal(t, "anonymous", trial.Inputs[0].UserID)
 	})
 
 	t.Run("AddsTrialToExistingExperiment", func(t *testing.T) {

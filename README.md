@@ -1,6 +1,6 @@
-# mlmodelscope API components
+# MLModelScope API components
 
-This repository provides the main parts of the mlmodelscope API
+This repository provides the main parts of the MLModelScope API
 
 ## Deployment
 
@@ -26,10 +26,29 @@ debugger attached. Delve listens on port 2345, which is exposed to the host
 machine. The API itself will not begin running until a debugging client is
 attached to Delve.
 
-## Uploader
+## Companion
 
-The `/uploader` directory contains an application that provides a file
-upload endpoint backed by [tusd](https://github.com/tus/tusd).
+[Companion](https://uppy.io/docs/companion/) is a service used to enable direct
+uploads to a cloud storage provider. It requires additional environment variables
+for configuration:
+
+    * COMPANION_AWS_KEY
+    * COMPANION_AWS_SECRET
+    * COMPANION_AWS_BUCKET
+    * COMPANION_AWS_REGION
+
+In local development these variables should be provided in an environment
+file named `.env.companion` in the project root folder. As this file will
+likely contain private credentials it should **never** be committed to source
+control!
+
+## Traefik
+
+[Traefik](https://doc.traefik.io/traefik/) is used as a reverse proxy for local
+development to provide services at URLs such as http://api.local.mlmodelscope.org/.
+If you are running a local copy of the
+[MLModelScope React App](https://github.com/c3sr/mlmodelscope) on port 3000, Traefik
+will proxy that at http://local.mlmodelscope.org/.
 
 ## Running an agent alongside the API
 

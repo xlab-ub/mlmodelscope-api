@@ -12,15 +12,24 @@ func TestExperimentInteractor(t *testing.T) {
 	CreateTestDatabase()
 	defer cleanupTestDatabase()
 
-	t.Run("CannotCreateExperimentWithEmptyId", func (t *testing.T) {
+	testDb.CreateUser(&models.User{ID: "testUser"})
+
+	t.Run("CannotCreateExperimentWithEmptyId", func(t *testing.T) {
 		experiment := &models.Experiment{}
 		err := testDb.CreateExperiment(experiment)
 
 		assert.Equal(t, "attempt to create Experiment without ID", err.Error())
 	})
 
+	t.Run("CannotCreateExperimentWithoutUserId", func(t *testing.T) {
+		experiment := &models.Experiment{ID: "experimentWithoutUser"}
+		err := testDb.CreateExperiment(experiment)
+
+		assert.Equal(t, "attempt to create Experiment without User", err.Error())
+	})
+
 	t.Run("CreateAndQueryExperimentWithoutTrial", func(t *testing.T) {
-		testDb.CreateExperiment(&models.Experiment{ID: "experiment1"})
+		testDb.CreateExperiment(&models.Experiment{ID: "experiment1", UserID: "testUser"})
 		experiment, err := testDb.GetExperimentById("experiment1")
 
 		assert.Nil(t, err)

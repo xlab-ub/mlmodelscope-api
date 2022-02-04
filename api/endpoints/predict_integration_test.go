@@ -123,6 +123,7 @@ func TestPredictEndpoint(t *testing.T) {
 		trial, _ := db.GetTrialById(message.CorrelationId)
 		assert.NotNil(t, trial)
 		assert.Equal(t, response.TrialId, trial.ID)
+		assert.Equal(t, "anonymous", trial.Inputs[0].UserID)
 	})
 
 	t.Run("StatusTrackerCompletesTrial", func(t *testing.T) {
