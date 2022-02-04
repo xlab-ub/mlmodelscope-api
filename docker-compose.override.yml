@@ -58,6 +58,9 @@ services:
       - "traefik.http.middlewares.add-cors-companion.headers.addvaryheader=true"
       - "traefik.http.routers.mlmodelscope-companion.middlewares=add-cors-companion"
 
+    volumes:
+      - /tmp/companion_data:/data
+
   db:
     image: postgres:14.1
 

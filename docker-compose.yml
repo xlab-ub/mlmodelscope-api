@@ -41,9 +41,6 @@ services:
       COMPANION_DOMAIN: "http://companion.${ENVIRONMENT}mlmodelscope.org"
       COMPANION_DATADIR: "/data"
 
-    volumes:
-      - /tmp/companion_data:/data
-
   mq:
     image: rabbitmq:3-management-alpine
     environment:
