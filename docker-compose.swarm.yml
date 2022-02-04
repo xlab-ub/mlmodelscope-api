@@ -32,7 +32,7 @@ services:
         - "traefik.docker.network=traefik"
         - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.${ENVIRONMENT}mlmodelscope.org`)"
         - "traefik.http.routers.mlmodelscope-companion.entrypoints=websecure"
-        - "traefik.http.routers.mlmodelscope-api.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.mlmodelscope-companion.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
         - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowMethods=GET,OPTIONS,POST"
         - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.org"
