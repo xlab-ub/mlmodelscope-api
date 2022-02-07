@@ -64,6 +64,8 @@ services:
         - "traefik.http.routers.mlmodelscope-mq.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-mq.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-mq.loadbalancer.server.port=15672"
+    environment:
+      RABBITMQ_NODENAME: "$RABBITMQ_NODENAME"
     volumes:
       - staging-rabbit-efs:/var/lib/rabbitmq/mnesia
 
