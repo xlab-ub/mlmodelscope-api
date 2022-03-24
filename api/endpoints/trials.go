@@ -10,10 +10,11 @@ import (
 )
 
 type trialResponse struct {
-	ID          string       `json:"id"`
-	Inputs      []string     `json:"inputs"`
-	CompletedAt *time.Time   `json:"completed_at,omitempty"`
-	Results     trialResults `json:"results,omitempty"`
+	ID          string        `json:"id"`
+	Inputs      []string      `json:"inputs"`
+	CompletedAt *time.Time    `json:"completed_at,omitempty"`
+	Results     trialResults  `json:"results,omitempty"`
+	Model       *models.Model `json:"model,omitempty"`
 }
 
 type trialResults struct {
@@ -79,6 +80,7 @@ func trialToResponse(t *models.Trial) (r *trialResponse) {
 		ID:          t.ID,
 		Inputs:      inputs,
 		CompletedAt: t.CompletedAt,
+		Model:       t.Model,
 		Results:     results,
 	}
 
