@@ -37,7 +37,7 @@ func TestTrialRoute(t *testing.T) {
 			ID:           "trial1",
 			ModelID:      1,
 			ExperimentID: "test",
-			Inputs:       []models.TrialInput{
+			Inputs: []models.TrialInput{
 				models.TrialInput{
 					URL: "test_url",
 				},
@@ -55,6 +55,7 @@ func TestTrialRoute(t *testing.T) {
 
 		assert.Equal(t, "trial1", trial.ID)
 		assert.Equal(t, "test_url", trial.Inputs[0])
+		assert.Equal(t, uint(1), trial.Model.ID)
 		assert.Nil(t, trial.CompletedAt)
 	})
 
@@ -63,7 +64,7 @@ func TestTrialRoute(t *testing.T) {
 			ID:           "trial2",
 			ModelID:      1,
 			ExperimentID: "test",
-			Inputs:       []models.TrialInput{
+			Inputs: []models.TrialInput{
 				models.TrialInput{
 					URL: "test_url",
 				},
@@ -83,6 +84,7 @@ func TestTrialRoute(t *testing.T) {
 
 		assert.Equal(t, "trial2", response.ID)
 		assert.Equal(t, "test_url", response.Inputs[0])
+		assert.Equal(t, uint(1), response.Model.ID)
 		assert.True(t, response.CompletedAt.Equal(*trial.CompletedAt))
 		assert.Equal(t, 1, len(response.Results.Responses))
 	})
