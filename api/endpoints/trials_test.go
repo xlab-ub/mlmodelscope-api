@@ -85,6 +85,7 @@ func TestTrialRoute(t *testing.T) {
 		assert.Equal(t, "trial2", response.ID)
 		assert.Equal(t, "test_url", response.Inputs[0])
 		assert.Equal(t, uint(1), response.Model.ID)
+		assert.Equal(t, uint(1), response.Model.Framework.ID)
 		assert.True(t, response.CompletedAt.Equal(*trial.CompletedAt))
 		assert.Equal(t, 1, len(response.Results.Responses))
 	})

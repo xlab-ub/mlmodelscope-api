@@ -60,6 +60,14 @@ func GetTrial(c *gin.Context) {
 			return
 		}
 
+		framework, err := db.QueryFrameworks(&models.Framework{ID: uint(trial.Model.FrameworkID)})
+		if err != nil {
+			log.Printf("[WARN] %s", err.Error())
+			c.JSON(500, NewErrorResponse(err))
+			return
+		}
+
+		trial.Model.Framework = framework
 		response := trialToResponse(trial)
 		c.JSON(200, response)
 	}
