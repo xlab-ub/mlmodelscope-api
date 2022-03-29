@@ -123,6 +123,19 @@ func TestQueryModelById(t *testing.T) {
 	assert.Equal(t, "modelById2", result.Name)
 }
 
+func TestQueryModelByIdIncludesFrameworkAndArchitectures(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFramework("fw1", "arch1")
+	testDb.CreateModel(&models.Model{Name: "model1", FrameworkID: 1})
+
+	result, _ := testDb.GetModelById(1)
+
+	assert.Equal(t, "model1", result.Name)
+	assert.Equal(t, "fw1", result.Framework.Name)
+	assert.Equal(t, "arch1", result.Framework.Architectures[0].Name)
+}
+
 func TestQueryModelsByFrameworkId(t *testing.T) {
 	CreateTestDatabase()
 	defer cleanupTestDatabase()
@@ -165,7 +178,7 @@ func TestQueryModelsByArchitecture(t *testing.T) {
 	defer cleanupTestDatabase()
 	createFrameworkNamed("fw1")
 	testDb.CreateFramework(&models.Framework{
-		Name:          "fw2",
+		Name: "fw2",
 		Architectures: []models.Architecture{
 			models.Architecture{Name: "arm"},
 		},

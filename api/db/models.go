@@ -26,7 +26,11 @@ func (d *Db) GetAllModels() (m []models.Model, err error) {
 }
 
 func (d *Db) GetModelById(id uint) (m *models.Model, err error) {
-	err = d.database.Joins("Framework").First(&m, id).Error
+	err = d.database.
+		Joins("Framework").
+		Preload("Framework.Architectures").
+		Joins("LEFT JOIN architectures ON architectures.framework_id = \"Framework\".id").
+		First(&m, id).Error
 
 	if err != nil {
 		err = fmt.Errorf("Unknown Model Id: %d", id)
