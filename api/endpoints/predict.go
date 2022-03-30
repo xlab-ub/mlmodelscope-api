@@ -9,6 +9,7 @@ import (
 	"github.com/c3sr/mq/messages"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"os"
 	"strings"
 )
 
@@ -82,7 +83,15 @@ func makePredictMessage(request *predictRequestBody, model *models.Model) *messa
 		ModelName:             fmt.Sprintf("%s_%s", strings.ToLower(model.Name), model.Version),
 		Warmups:               1,
 		TraceLevel:            request.TraceLevel,
-		TracerAddress:         "trace.mlmodelscope.org",
+		TracerAddress:         getTracerAddress(),
 		UseGpu:                false,
 	}
+}
+
+func getTracerAddress() (address string) {
+	if address = os.Getenv("TRACER_ADDRESS"); address == "" {
+		address = "trace.mlmodelscope.org"
+	}
+
+	return
 }
