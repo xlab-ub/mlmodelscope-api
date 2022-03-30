@@ -14,6 +14,7 @@ services:
       - MQ_PORT=$MQ_PORT
       - MQ_USER=$MQ_USER
       - MQ_PASSWORD=$MQ_PASSWORD
+      - TRACER_ADDRESS=$TRACER_ADDRESS
 
     depends_on:
       - mq
