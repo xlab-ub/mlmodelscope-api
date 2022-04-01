@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -81,7 +82,7 @@ func makePredictMessage(request *predictRequestBody, model *models.Model) *messa
 		DesiredResultModality: request.DesiredResultModality,
 		Inputs:                request.Inputs,
 		ModelName:             fmt.Sprintf("%s_%s", strings.ToLower(model.Name), model.Version),
-		Warmups:               1,
+		Warmups:               getWarmups(),
 		TraceLevel:            request.TraceLevel,
 		TracerAddress:         getTracerAddress(),
 		UseGpu:                false,
@@ -94,4 +95,17 @@ func getTracerAddress() (address string) {
 	}
 
 	return
+}
+
+func getWarmups() uint {
+	if warmups := os.Getenv("WARMUP_ROUNDS"); warmups == "" {
+		return 0
+	} else {
+		num, err := strconv.ParseUint(warmups, 10, 32)
+		if err != nil {
+			return 0
+		}
+
+		return uint(num)
+	}
 }
