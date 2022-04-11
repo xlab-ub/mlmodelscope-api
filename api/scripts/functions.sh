@@ -74,3 +74,17 @@ function stop_rabbitmq() {
   echo "Cleaning up RabbitMQ container..."
   docker stop mlmodelscope-api_rabbitmq-integration > /dev/null
 }
+
+function start_integration_containers() {
+  set_environment
+
+  start_postgres
+  start_rabbitmq
+  start_mock_agent
+}
+
+function stop_integration_containers() {
+  stop_postgres
+  stop_rabbitmq
+  stop_mock_agent
+}
