@@ -18,6 +18,7 @@ type Model struct {
 	License          string          `json:"license"`
 	Name             string          `gorm:"index:idx_models_name,expression:LOWER(name)" json:"name"`
 	Output           ModelOutput     `gorm:"embedded;embeddedPrefix:output_" json:"output"`
+	Urls             ModelUrls       `gorm:"embedded;embeddedPrefix:url_" json:"url"`
 	Version          string          `json:"version"`
 }
 
@@ -39,4 +40,11 @@ type ModelDetails struct {
 type ModelOutput struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
+}
+
+type ModelUrls struct {
+	Github   string `json:"github"`
+	Citation string `json:"citation"`
+	Link1    string `json:"link1"`
+	Link2    string `json:"link2"`
 }
