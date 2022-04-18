@@ -54,7 +54,7 @@ func processMessage(message interfaces.Message) {
 	trial, err := database.GetTrialById(message.CorrelationId)
 	if err != nil {
 		log.Printf("[WARN] failed to retrieve Trial ID %s in Status Tracker: %s", message.CorrelationId, err.Error())
-		_ = mq.Nack(message)
+		_ = mq.Acknowledge(message)
 		return
 	}
 
