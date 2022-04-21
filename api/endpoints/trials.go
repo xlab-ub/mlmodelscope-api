@@ -27,15 +27,53 @@ type responseFeatures struct {
 }
 
 type responseFeature struct {
-	ID             string                `json:"id"`
-	Probability    float64               `json:"probability"`
-	Type           string                `json:"type"`
-	Classification featureClassification `json:"classification"`
+	ID               string                       `json:"id"`
+	Probability      float64                      `json:"probability"`
+	Type             string                       `json:"type"`
+	BoundingBox      *featureBoundingBox          `json:"bounding_box,omitempty"`
+	Classification   *featureClassification       `json:"classification,omitempty"`
+	ImageEnhancement *featureImageEnhancement     `json:"image,omitempty"`
+	InstanceSegment  *featureInstanceSegmentation `json:"instance_segment,omitempty"`
+	SemanticSegment  *featureSemanticSegment      `json:"semantic_segment,omitempty"`
+}
+
+type featureBoundingBox struct {
+	Index int64   `json:"index"`
+	Label string  `json:"label"`
+	XMax  float64 `json:"xmax"`
+	XMin  float64 `json:"xmin"`
+	YMax  float64 `json:"ymax"`
+	YMin  float64 `json:"ymin"`
 }
 
 type featureClassification struct {
 	Index uint   `json:"index"`
 	Label string `json:"label"`
+}
+
+type featureImageEnhancement struct {
+	Data []byte `json:"data"`
+}
+
+type featureInstanceSegmentation struct {
+	FloatMask []float32 `json:"float_mask"`
+	Height    int32     `json:"height,omitempty"`
+	Index     int32     `json:"index,omitempty"`
+	IntMask   []int32   `json:"int_mask"`
+	Label     string    `json:"label,omitempty"`
+	MaskType  string    `json:"mask_type,omitempty"`
+	Width     int32     `json:"width,omitempty"`
+	Xmax      float32   `json:"xmax,omitempty"`
+	Xmin      float32   `json:"xmin,omitempty"`
+	Ymax      float32   `json:"ymax,omitempty"`
+	Ymin      float32   `json:"ymmin,omitempty"`
+}
+
+type featureSemanticSegment struct {
+	Height uint     `json:"height"`
+	Labels []string `json:"labels"`
+	Mask   []uint   `json:"int_mask"`
+	Width  uint     `json:"width"`
 }
 
 type traceId struct {
