@@ -22,6 +22,7 @@ func SetupRoutes() *gin.Engine {
 
 	trial := r.Group("/trial")
 	{
+		trial.DELETE("/:trial_id", DeleteTrial)
 		trial.GET("/:trial_id", GetTrial)
 	}
 

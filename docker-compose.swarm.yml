@@ -13,7 +13,7 @@ services:
         - "traefik.http.routers.mlmodelscope-api.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-api.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT"
+        - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT,DELETE"
         - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.org"
         - "traefik.http.middlewares.add-cors.headers.accessControlAllowCredentials=true"
         - "traefik.http.middlewares.add-cors.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id"

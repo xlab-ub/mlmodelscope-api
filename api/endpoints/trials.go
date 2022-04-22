@@ -80,6 +80,25 @@ type traceId struct {
 	Id string `json:"id,omitempty"`
 }
 
+func DeleteTrial(c *gin.Context) {
+	if id := c.Param("trial_id"); id == "" {
+		c.JSON(404, NotFoundResponse)
+		return
+	} else {
+		db, err := api_db.GetDatabase()
+		if err != nil {
+			c.JSON(500, NewErrorResponse(err))
+			return
+		}
+
+		err = db.DeleteTrial(id)
+		if err != nil {
+			c.JSON(400, NewErrorResponse(err))
+			return
+		}
+	}
+}
+
 func GetTrial(c *gin.Context) {
 	if id := c.Param("trial_id"); id == "" {
 		c.JSON(404, NotFoundResponse)

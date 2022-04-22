@@ -89,4 +89,25 @@ func TestTrialRoute(t *testing.T) {
 		assert.True(t, response.CompletedAt.Equal(*trial.CompletedAt))
 		assert.Equal(t, 1, len(response.Results.Responses))
 	})
+
+	t.Run("DeleteOnlyTrialInExperiment", func(t *testing.T) {
+		testDb.CreateExperiment(&models.Experiment{ID: "deletion", UserID: "experimentTestUser"})
+		testDb.CreateTrial(&models.Trial{ID: "delete1", ExperimentID: "deletion", ModelID: 1})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("DELETE", "/trial/delete1", nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, 400, w.Code)
+	})
+
+	t.Run("DeleteTrialFromExperiment", func(t *testing.T) {
+		testDb.CreateTrial(&models.Trial{ID: "delete2", ExperimentID: "deletion", ModelID: 1})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("DELETE", "/trial/delete1", nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, 200, w.Code)
+	})
 }
