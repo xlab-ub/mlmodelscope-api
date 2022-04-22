@@ -9,6 +9,7 @@ import (
 type TrialInteractor interface {
 	CompleteTrial(*models.Trial, string) error
 	CreateTrial(*models.Trial) error
+	DeleteTrial(id string) error
 	GetAllTrials() ([]models.Trial, error)
 	GetTrialById(id string) (*models.Trial, error)
 }
@@ -36,6 +37,21 @@ func (d *Db) CreateTrial(trial *models.Trial) (err error) {
 	return d.database.Create(trial).Error
 }
 
+func (d *Db) DeleteTrial(id string) error {
+	if trial, err := d.GetTrialById(id); err != nil {
+		return err
+	} else {
+		if experiment, err := d.GetExperimentById(trial.ExperimentID); err != nil {
+			return err
+		} else {
+			if len(experiment.Trials) == 1 {
+				return fmt.Errorf("DeleteTrial: Experiment must have at least one Trial")
+			}
+		}
+	}
+	return d.database.Delete(&models.Trial{ID: id}).Error
+}
+
 func (d *Db) GetAllTrials() (trials []models.Trial, err error) {
 	err = d.database.Preload("Inputs").Joins("Model").Find(&trials).Error
 
@@ -47,6 +63,7 @@ func (d *Db) GetTrialById(id string) (trial *models.Trial, err error) {
 
 	if err != nil {
 		err = fmt.Errorf("unknown Trial: %s", id)
+		return nil, err
 	}
 
 	return

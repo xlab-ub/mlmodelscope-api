@@ -128,4 +128,27 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Equal(t, "experiment1", trial.Experiment.ID)
 		assert.Equal(t, "testUser", trial.Experiment.UserID)
 	})
+
+	t.Run("CannotDeleteOnlyTrialInExperiment", func(t *testing.T) {
+		testDb.CreateExperiment(&models.Experiment{ID: "deletion", UserID: "testUser"})
+		testDb.CreateTrial(&models.Trial{ID: "trial5", ExperimentID: "deletion", ModelID: 1})
+
+		err := testDb.DeleteTrial("trial5")
+
+		assert.NotNil(t, err)
+		assert.Equal(t, "DeleteTrial: Experiment must have at least one Trial", err.Error())
+	})
+
+	t.Run("CanDeleteTrialFromExperiment", func(t *testing.T) {
+		testDb.CreateTrial(&models.Trial{ID: "trial6", ExperimentID: "deletion", ModelID: 1})
+
+		err := testDb.DeleteTrial("trial5")
+
+		assert.Nil(t, err)
+
+		trial, err := testDb.GetTrialById("trial5")
+
+		assert.NotNil(t, err)
+		assert.Nil(t, trial)
+	})
 }
