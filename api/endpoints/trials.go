@@ -66,7 +66,7 @@ type featureInstanceSegmentation struct {
 	Xmax      float32   `json:"xmax,omitempty"`
 	Xmin      float32   `json:"xmin,omitempty"`
 	Ymax      float32   `json:"ymax,omitempty"`
-	Ymin      float32   `json:"ymmin,omitempty"`
+	Ymin      float32   `json:"ymin,omitempty"`
 }
 
 type featureSemanticSegment struct {
@@ -141,12 +141,25 @@ func trialToResponse(t *models.Trial) (r *trialResponse) {
 	if err != nil {
 		log.Printf("[WARN] %s", err.Error())
 	}
+
+	results.Responses = removeEmptyResponses(results.Responses)
+
 	r = &trialResponse{
 		ID:          t.ID,
 		Inputs:      inputs,
 		CompletedAt: t.CompletedAt,
 		Model:       t.Model,
 		Results:     results,
+	}
+
+	return
+}
+
+func removeEmptyResponses(input []responseFeatures) (output []responseFeatures) {
+	for _, response := range input {
+		if len(response.Features) > 0 {
+			output = append(output, response)
+		}
 	}
 
 	return
