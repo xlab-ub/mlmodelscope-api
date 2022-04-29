@@ -1,6 +1,11 @@
 cd `git rev-parse --show-toplevel`
 
+DB_DRIVER=postgres
+export DB_DRIVER
+DB_DBNAME=mlmodelscope
+export DB_DBNAME
 DB_PORT=5432
+export DB_PORT
 
 if [ -z "$1" ]; then
   echo "You must pass an import file name as the first argument to this script!"
@@ -22,16 +27,20 @@ if [ -z "$DB_HOST" ]; then
   echo "You must provide a database host!"
   exit 1
 fi
+export DB_HOST
 
 if [ -z "$DB_USER" ]; then
   echo "You must provide a database user!"
   exit 1
 fi
+export DB_USER
 
 if [ -z "$PGPASSWORD" ]; then
   echo "You must provide a database password!"
   exit 1
 fi
+export DB_PASSWORD
+export PGPASSWORD
 
 cd import
 go build .
