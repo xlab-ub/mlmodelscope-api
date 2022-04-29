@@ -248,6 +248,19 @@ func TestQueryModelsBySearchString(t *testing.T) {
 	assert.Equal(t, uint(3), result[0].ID)
 }
 
+func TestQueryModelsExcludesDeleted(t *testing.T) {
+	CreateTestDatabase()
+	defer cleanupTestDatabase()
+	createFrameworkNamed("Pytorch")
+	testDb.CreateModel(&models.Model{Name: "AlexNet", FrameworkID: 1, Description: ""})
+	testDb.CreateModel(&models.Model{Name: "Inception_v3", FrameworkID: 1, Description: ""})
+	testDb.DeleteModel(&models.Model{ID: 1})
+
+	result, _ := testDb.QueryModels(0, "", "", "")
+
+	assert.Equal(t, 1, len(result))
+}
+
 func TestQueryFrameworksByNameAndVersion(t *testing.T) {
 	CreateTestDatabase()
 	defer cleanupTestDatabase()

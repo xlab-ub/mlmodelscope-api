@@ -9,6 +9,7 @@ import (
 
 type ModelInteractor interface {
 	CreateModel(*models.Model) error
+	DeleteModel(*models.Model) error
 	GetAllModels() ([]models.Model, error)
 	GetModelsByTask(string) ([]models.Model, error)
 	GetModelsForFramework(int) ([]models.Model, error)
@@ -17,6 +18,10 @@ type ModelInteractor interface {
 
 func (d *Db) CreateModel(m *models.Model) (err error) {
 	return d.database.Create(m).Error
+}
+
+func (d *Db) DeleteModel(m *models.Model) error {
+	return d.database.Delete(m).Error
 }
 
 func (d *Db) GetAllModels() (m []models.Model, err error) {
