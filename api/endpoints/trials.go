@@ -32,7 +32,7 @@ type responseFeature struct {
 	Type             string                       `json:"type"`
 	BoundingBox      *featureBoundingBox          `json:"bounding_box,omitempty"`
 	Classification   *featureClassification       `json:"classification,omitempty"`
-	ImageEnhancement *featureImageEnhancement     `json:"image,omitempty"`
+	ImageEnhancement *featureImageEnhancement     `json:"raw_image,omitempty"`
 	InstanceSegment  *featureInstanceSegmentation `json:"instance_segment,omitempty"`
 	SemanticSegment  *featureSemanticSegment      `json:"semantic_segment,omitempty"`
 }
@@ -52,7 +52,15 @@ type featureClassification struct {
 }
 
 type featureImageEnhancement struct {
-	Data []byte `json:"data"`
+	Channels       int32     `json:"channels,omitempty"`
+	CharList       []int32   `json:"char_list"`
+	CompressedData []byte    `json:"compressed_data,omitempty"`
+	DataType       string    `json:"data_type,omitempty"`
+	FloatList      []float32 `json:"float_list"`
+	Height         int32     `json:"height,omitempty"`
+	ID             string    `json:"id,omitempty"`
+	JpegData       []byte    `json:"jpeg_data,omitempty"`
+	Width          int32     `json:"width,omitempty"`
 }
 
 type featureInstanceSegmentation struct {
