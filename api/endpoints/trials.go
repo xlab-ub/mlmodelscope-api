@@ -18,8 +18,10 @@ type trialResponse struct {
 }
 
 type trialResults struct {
-	Responses []responseFeatures `json:"responses,omitempty"`
-	TraceId   traceId            `json:"trace_id,omitempty"`
+	Duration             string             `json:"duration,omitempty"`
+	DurationForInference string             `json:"duration_for_inference,omitempty"`
+	Responses            []responseFeatures `json:"responses,omitempty"`
+	TraceId              traceId            `json:"trace_id,omitempty"`
 }
 
 type responseFeatures struct {

@@ -71,7 +71,7 @@ func TestTrialRoute(t *testing.T) {
 			},
 		})
 		trial, _ := testDb.GetTrialById("trial2")
-		testDb.CompleteTrial(trial, "{\"responses\": [{\"features\": [{\"classification\":{\"index\": 933,\"label\":\"n07697313 cheeseburger\"},\"id\": \"61afb91c7cc38300018b8a74\",\"probability\": 0.64689136,\"type\": \"CLASSIFICATION\"}]}], \"trace_id\": {\"id\": \"trace\"}}")
+		testDb.CompleteTrial(trial, "{\"duration\": \"1s\", \"duration_for_inference\": \"0.5s\", \"responses\": [{\"features\": [{\"classification\":{\"index\": 933,\"label\":\"n07697313 cheeseburger\"},\"id\": \"61afb91c7cc38300018b8a74\",\"probability\": 0.64689136,\"type\": \"CLASSIFICATION\"}]}], \"trace_id\": {\"id\": \"trace\"}}")
 
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/trial/trial2", nil)
@@ -87,6 +87,8 @@ func TestTrialRoute(t *testing.T) {
 		assert.Equal(t, uint(1), response.Model.ID)
 		assert.Equal(t, uint(1), response.Model.Framework.ID)
 		assert.True(t, response.CompletedAt.Equal(*trial.CompletedAt))
+		assert.Equal(t, "1s", response.Results.Duration)
+		assert.Equal(t, "0.5s", response.Results.DurationForInference)
 		assert.Equal(t, 1, len(response.Results.Responses))
 	})
 
