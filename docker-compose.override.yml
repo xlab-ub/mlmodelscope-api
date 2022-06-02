@@ -17,7 +17,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.local.mlmodelscope.org`)"
+      - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.${ENVIRONMENT}mlmodelscope.org`)"
       - "traefik.http.routers.mlmodelscope-api.entrypoints=web"
       - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=8080"
       - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,POST,PUT,DELETE"
@@ -47,7 +47,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.local.mlmodelscope.org`)"
+      - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.${ENVIRONMENT}mlmodelscope.org`)"
       - "traefik.http.routers.mlmodelscope-companion.entrypoints=web"
       - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
       - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowMethods=GET,OPTIONS,POST"
@@ -75,6 +75,21 @@ services:
     volumes:
       - ./docker/data:/docker-entrypoint-initdb.d/
 
+  mq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+
+    volumes:
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+
+  consul:
+    volumes:
+      - ./docker/consul/server.json:/consul/config/server.json:ro
+      - consul_data:/consul/data
+
   traefik:
     image: traefik:v2.5
     command:
@@ -96,7 +111,39 @@ services:
       - ./docker/mlmodelscope-www.yml:/root/mlmodelscope-www.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+### Monitoring services
+
+  grafana:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.org`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+    networks:
+      - default
+      - traefik
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/rabbitmq.yaml
+      - ./docker/grafana/datasources.yml:/etc/grafana/provisioning/datasources/prometheus.yaml
+      - ./docker/grafana/dashboards:/dashboards
+
+  prometheus:
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
 networks:
   traefik:
     name: traefik
     attachable: true
+
+volumes:
+  consul_data:
+  prometheus_data:
+  grafana_data:

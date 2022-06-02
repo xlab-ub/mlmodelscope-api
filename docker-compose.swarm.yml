@@ -64,10 +64,67 @@ services:
         - "traefik.http.routers.mlmodelscope-mq.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-mq.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-mq.loadbalancer.server.port=15672"
+    configs:
+      - source: rabbitmq_config
+        target: /etc/rabbitmq/rabbitmq.conf
+      - source: rabbitmq_definitions
+        target: /etc/rabbitmq/definitions.json
     environment:
       RABBITMQ_NODENAME: "$RABBITMQ_NODENAME"
     volumes:
       - staging-rabbit-efs:/var/lib/rabbitmq/mnesia
+
+  consul:
+    configs:
+      - source: consul_config
+        target: /consul/config/server.json
+    volumes:
+      - consul_data:/consul/data
+
+### Monitoring services
+
+  grafana:
+    configs:
+      - source: grafana_dashboards_config
+        target: /etc/grafana/provisioning/dashboards/rabbitmq.yaml
+      - source: grafana_prometheus_datasource
+        target: /etc/grafana/provisioning/datasources/prometheus.yaml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.org`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+    networks:
+      - default
+      - traefik
+
+    volumes:
+      - grafana_dashboards:/dashboards
+      - grafana_data:/var/lib/grafana
+
+  prometheus:
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+
+configs:
+  consul_config:
+    external: true
+  grafana_dashboards_config:
+    external: true
+  grafana_prometheus_datasource:
+    external: true
+  prometheus_config:
+    external: true
+  rabbitmq_config:
+    external: true
+  rabbitmq_definitions:
+    external: true
 
 networks:
   traefik:
@@ -78,3 +135,8 @@ volumes:
   staging-rabbit-efs:
     external: true
   staging-companion-data:
+  consul_data:
+  grafana_dashboards:
+  grafana_data:
+  prometheus_data:
+

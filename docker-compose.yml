@@ -45,9 +45,46 @@ services:
 
   mq:
     image: rabbitmq:3-management-alpine
+    depends_on:
+      - consul
     environment:
-      RABBITMQ_DEFAULT_USER: "$MQ_USER"
-      RABBITMQ_DEFAULT_PASS: "$MQ_PASSWORD"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+      RABBITMQ_ERLANG_COOKIE: "$MQ_ERLANG_COOKIE"
+
+  consul:
+    image: hashicorp/consul:1.12
+    command: "agent -bootstrap=1"
+
+### Monitoring services
+
+  grafana:
+    image: grafana/grafana:8.5.3
+    environment:
+      GF_INSTALL_PLUGINS: "flant-statusmap-panel,grafana-piechart-panel"
+
+  prometheus:
+    image: prom/prometheus:v2.35.0
+
+  node-exporter:
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
+    image: prom/node-exporter:v1.3.1
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+  cadvisor:
+    expose:
+      - 8080
+    image: gcr.io/cadvisor/cadvisor:v0.44.0
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
