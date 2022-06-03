@@ -93,13 +93,15 @@ services:
         target: /etc/grafana/provisioning/dashboards/rabbitmq.yaml
       - source: grafana_prometheus_datasource
         target: /etc/grafana/provisioning/datasources/prometheus.yaml
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.org`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik"
+        - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.org`)"
+        - "traefik.http.routers.grafana.entrypoints=websecure"
+        - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
     networks:
       - default
