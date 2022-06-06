@@ -20,6 +20,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Goto API
+        run: cd api
+
       - name: Build Image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -27,7 +30,7 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
           containerfiles: |
-            ./docker/Dockerfile.api
+            ../docker/Dockerfile.api
 
       - name: Push to GHCR
         id: push-to-ghcr
