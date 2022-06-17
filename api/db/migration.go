@@ -66,4 +66,5 @@ var migrators = [](func(*gorm.DB) error){
 	migrations.CreateAnonymousUser,
 	migrations.AddModelShortDescription,
 	migrations.AddModelUrls,
+	migrations.AddSourceTrialToTrial,
 }
