@@ -3,6 +3,7 @@ package db
 import (
 	"api/db/models"
 	"fmt"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -67,6 +68,19 @@ func (d *Db) GetTrialById(id string) (trial *models.Trial, err error) {
 		return nil, err
 	}
 
+	if trial.SourceTrialID != "" {
+		sourceId := trial.SourceTrialID
+		experimentId := trial.ExperimentID
+		trial, err = d.GetTrialById(sourceId)
+		if err != nil {
+			err = errors.Wrapf(err, "failed to lookup source trial: %s", sourceId)
+			return nil, err
+		}
+
+		trial.ID = id
+		trial.ExperimentID = experimentId
+	}
+
 	return
 }
 
@@ -79,7 +93,7 @@ func (d *Db) GetTrialByModelAndInput(modelId uint, inputUrl string) (trial *mode
 		Preload("Inputs").
 		Joins("Experiment").
 		Joins("Model").
-		Where("trials.model_id = ? AND trials.id IN (?)", modelId, inputQuery).
+		Where("trials.completed_at IS NOT NULL AND trials.model_id = ? AND trials.id IN (?)", modelId, inputQuery).
 		First(&trial).Error
 
 	if err != nil {

@@ -153,6 +153,7 @@ func TestTrialInteractor(t *testing.T) {
 	})
 
 	t.Run("FindTrialByModelAndInputUrl", func(t *testing.T) {
+		now := time.Now()
 		testDb.CreateTrial(&models.Trial{
 			ID:           "trial7",
 			ExperimentID: "caching",
@@ -160,6 +161,7 @@ func TestTrialInteractor(t *testing.T) {
 			Inputs: []models.TrialInput{
 				{URL: "cached_input"},
 			},
+			CompletedAt: &now,
 		})
 
 		trial, err := testDb.GetTrialByModelAndInput(1, "cached_input")
@@ -167,5 +169,24 @@ func TestTrialInteractor(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, trial)
 		assert.Equal(t, "trial7", trial.ID)
+	})
+
+	t.Run("QueryTrialByIdReturnsSourceTrialResults", func(t *testing.T) {
+		now := time.Now()
+		testDb.CreateTrial(&models.Trial{
+			ID:            "trial8",
+			ExperimentID:  "source_trial",
+			ModelID:       1,
+			SourceTrialID: "trial2",
+			CompletedAt:   &now,
+		})
+
+		trial, err := testDb.GetTrialById("trial8")
+
+		assert.Nil(t, err)
+		assert.NotNil(t, trial)
+		assert.Equal(t, "trial8", trial.ID)
+		assert.Equal(t, "source_trial", trial.ExperimentID)
+		assert.Equal(t, "trial_results", trial.Result)
 	})
 }
