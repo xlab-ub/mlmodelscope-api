@@ -12,6 +12,7 @@ type TrialInteractor interface {
 	DeleteTrial(id string) error
 	GetAllTrials() ([]models.Trial, error)
 	GetTrialById(id string) (*models.Trial, error)
+	GetTrialByModelAndInput(modelId uint, inputUrl string) (*models.Trial, error)
 }
 
 func (d *Db) CompleteTrial(trial *models.Trial, result string) error {
@@ -63,6 +64,26 @@ func (d *Db) GetTrialById(id string) (trial *models.Trial, err error) {
 
 	if err != nil {
 		err = fmt.Errorf("unknown Trial: %s", id)
+		return nil, err
+	}
+
+	return
+}
+
+func (d *Db) GetTrialByModelAndInput(modelId uint, inputUrl string) (trial *models.Trial, err error) {
+	inputQuery := d.database.Select("trial_id").
+		Where("url = ?", inputUrl).
+		Table("trial_inputs")
+
+	err = d.database.
+		Preload("Inputs").
+		Joins("Experiment").
+		Joins("Model").
+		Where("trials.model_id = ? AND trials.id IN (?)", modelId, inputQuery).
+		First(&trial).Error
+
+	if err != nil {
+		err = fmt.Errorf("error querying trial with (Model: %d, InputUrl: %s)", modelId, inputUrl)
 		return nil, err
 	}
 
