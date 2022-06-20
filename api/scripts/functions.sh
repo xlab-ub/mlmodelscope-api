@@ -22,7 +22,7 @@ function start_mock_agent() {
       --env MQ_PORT="${MQ_PORT}" \
       --env MQ_USER="${MQ_USER}" \
       --env MQ_PASSWORD="${MQ_PASSWORD}" \
-      registry.staging.mlmodelscope.org:5000/mock-agent:latest \
+      ghcr.io/c3sr/mock-agent:latest \
       > /dev/null
 }
 

@@ -97,7 +97,7 @@ func (d *Db) GetTrialByModelAndInput(modelId uint, inputUrl string) (trial *mode
 		First(&trial).Error
 
 	if err != nil {
-		err = fmt.Errorf("error querying trial with (Model: %d, InputUrl: %s)", modelId, inputUrl)
+		err = errors.Wrapf(err, "error querying trial with (Model: %d, InputUrl: %s)", modelId, inputUrl)
 		return nil, err
 	}
 

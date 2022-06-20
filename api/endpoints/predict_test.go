@@ -189,6 +189,7 @@ func TestPredictRoute(t *testing.T) {
 		api_mq.SetMessageQueue(spy)
 		requestBody := validPredictRequestBody()
 		requestBody.Experiment = experimentId
+		requestBody.Inputs[0] = "input_url_2"
 		w := httptest.NewRecorder()
 		req := NewJsonRequest("POST", "/predict", requestBody)
 		router.ServeHTTP(w, req)
@@ -206,5 +207,20 @@ func TestPredictRoute(t *testing.T) {
 		experiment, _ := testDb.GetExperimentById(trial.ExperimentID)
 		assert.NotNil(t, experiment)
 		assert.Equal(t, 2, len(experiment.Trials))
+	})
+
+	t.Run("CreatesTrialFromMatchingSourceTrial", func(t *testing.T) {
+		completeTrial("trial1", "trial1_result")
+		requestBody := validPredictRequestBody()
+		w := httptest.NewRecorder()
+		req := NewJsonRequest("POST", "/predict", requestBody)
+		router.ServeHTTP(w, req)
+		response := predictResponseBody{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+
+		trial, _ := testDb.GetTrialById(response.TrialId)
+
+		assert.NotNil(t, trial)
+		assert.Equal(t, "trial1_result", trial.Result)
 	})
 }

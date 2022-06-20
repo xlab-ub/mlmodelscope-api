@@ -105,6 +105,7 @@ func TestPredictEndpoint(t *testing.T) {
 		channel, _ := messageQueue.SubscribeToChannel("API")
 
 		requestBody := validPredictRequestBody()
+		requestBody.Inputs = []string{"round_trip_input"}
 		// Predictions for model ID 2 should be processed by the mock agent
 		requestBody.Model = 2
 		w := httptest.NewRecorder()

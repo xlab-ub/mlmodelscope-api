@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type predictRequestBody struct {
@@ -38,6 +39,30 @@ func Predict(c *gin.Context) {
 	}
 
 	db, _ := api_db.GetDatabase()
+
+	existingTrialId := lookupExistingTrial(requestBody.Model, requestBody.Inputs[0])
+
+	var experimentId string
+	if experimentId = requestBody.Experiment; experimentId == "" {
+		experimentId = uuid.New().String()
+		db.CreateExperiment(&models.Experiment{ID: experimentId, UserID: userId})
+	}
+
+	if existingTrialId != "" {
+		trialId := uuid.New().String()
+		now := time.Now()
+		db.CreateTrial(&models.Trial{
+			ID:            trialId,
+			ExperimentID:  experimentId,
+			ModelID:       requestBody.Model,
+			SourceTrialID: existingTrialId,
+			CompletedAt:   &now,
+		})
+
+		c.JSON(200, &predictResponseBody{ExperimentId: experimentId, TrialId: trialId})
+		return
+	}
+
 	model, err := db.GetModelById(requestBody.Model)
 	if err != nil {
 		c.JSON(400, err)
@@ -60,13 +85,7 @@ func Predict(c *gin.Context) {
 		})
 	}
 
-	var experimentId string
-	if experimentId = requestBody.Experiment; experimentId == "" {
-		experimentId = uuid.New().String()
-		db.CreateExperiment(&models.Experiment{ID: experimentId, UserID: userId})
-	}
-
-	db.CreateTrial(&models.Trial{
+	err = db.CreateTrial(&models.Trial{
 		ID:           correlationId,
 		ExperimentID: experimentId,
 		ModelID:      model.ID,
@@ -74,6 +93,17 @@ func Predict(c *gin.Context) {
 	})
 
 	c.JSON(200, &predictResponseBody{ExperimentId: experimentId, TrialId: correlationId})
+}
+
+func lookupExistingTrial(modelId uint, input string) (trialId string) {
+	db, _ := api_db.GetDatabase()
+	trial, err := db.GetTrialByModelAndInput(modelId, input)
+
+	if err != nil || trial == nil {
+		return ""
+	}
+
+	return trial.ID
 }
 
 func makePredictMessage(request *predictRequestBody, model *models.Model) *messages.PredictByModelName {

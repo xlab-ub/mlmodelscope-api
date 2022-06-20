@@ -45,6 +45,12 @@ func createTestExperiment() {
 	testDb.CreateExperiment(&models.Experiment{ID: "test", UserID: "experimentTestUser"})
 }
 
+func completeTrial(trialId string, result string) {
+	trial, _ := testDb.GetTrialById(trialId)
+
+	testDb.CompleteTrial(trial, result)
+}
+
 func cleanupTestDatabase() {
 	api_db.CloseDatabase()
 	os.Remove("models_test.sqlite")
