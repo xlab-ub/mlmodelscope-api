@@ -2,6 +2,24 @@
 
 This repository provides the main parts of the MLModelScope API
 
+## Running
+
+To run a local version of the API you will need to have Docker and Docker
+Compose installed. The following command will build the latest API image
+and run it alongside the other necessary system components:
+
+`docker compose up -d --build`
+
+The additional components launched are:
+
+* RabbitMQ - message queue providing communication between the API and ML agents
+* PostgreSQL - the database
+  * The database is initialized from the file `docker/data/c3sr-bootstrap.sql.gz`
+* Companion - assists in cloud storage uploads, see below for details
+* Traefik - reverse proxy, see below for details
+* Consul - service discovery
+* A suite of services to support monitoring with Prometheus/Grafana
+
 ## Deployment
 
 The `DOCKER_REGISTRY` environment variable must be set to build or pull
@@ -9,6 +27,10 @@ the correct image tags for development, staging, or production. The `.env`
 file sets this to `c3sr` by default so that images will be tagged and
 pulled from the C3SR namespace on Docker Hub. Change this if you want to
 use a private registry to host your own modified images.
+
+This repository contains a Github workflow that will automatically build and
+push an API image to the Github Container Registry each time new commits
+are pushed to Github on the `master` branch.
 
 ## API
 
