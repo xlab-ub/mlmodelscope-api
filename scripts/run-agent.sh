@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 
+# This script is used to run a single agent container for a given framework.
+# It pulls the latest image from the GitHub Container Registry and runs it.
+# You will need to be logged in to the registry to pull the image.
+# See the following link for instructions to set up a Personal Access Token and use it to log in:
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry
+
 cd `git rev-parse --show-toplevel`
 source "scripts/functions.sh"
 
@@ -32,10 +38,11 @@ docker run \
     --ulimit memlock=-1 \
     --ulimit stack=67108864 \
     --privileged=true \
-    --network=host \
+    --network=mlmodelscope-api_default \
+    --env-file .env \
     -P \
     -v "`pwd`/.carml_config.yml:/root/.carml_config.yml" \
     -v "/tmp/results:/go/src/github.com/rai-project/mlmodelscope/results" \
-    c3sr/$AGENT:amd64-cpu-latest serve -l -d -v
+    ghcr.io/c3sr/$AGENT:latest
 
 cleanup_and_exit
