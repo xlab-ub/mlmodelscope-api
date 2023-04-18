@@ -37,6 +37,30 @@ are pushed to Github on the `master` branch.
 The `/api` directory contains an application that provides most of
 the API endpoints for mlmodelscope.
 
+### Running unit tests
+
+To run the unit tests, change to the `/api` directory and run:
+
+```bash
+go test ./...
+```
+
+Add the `-v` flag to see detailed output from the tests:
+
+```bash
+go test -v ./...
+```
+
+### Running integration tests
+
+To run the integration tests, change to the `/api` directory and run:
+
+```bash
+scripts/run-integration-tests.sh
+```
+
+This script will start the required services (RabbitMQ, PostgreSQL, and a Mock agent) in Docker containers and run the tests. When the tests are complete the containers will be stopped and removed.
+
 ### Debugging in a container
 
 It is possible to debug the API endpoints while they run in a container
