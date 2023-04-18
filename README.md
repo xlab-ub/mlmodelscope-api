@@ -32,6 +32,8 @@ This repository contains a Github workflow that will automatically build and
 push an API image to the Github Container Registry each time new commits
 are pushed to Github on the `master` branch.
 
+You can read more about the Docker Compose configuration [here](docs/docker-compose.md).
+
 ## API
 
 The `/api` directory contains an application that provides most of
