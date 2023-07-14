@@ -32,11 +32,20 @@ type responseFeature struct {
 	ID               string                       `json:"id"`
 	Probability      float64                      `json:"probability"`
 	Type             string                       `json:"type"`
+	Text             string                       `json:"text"`
 	BoundingBox      *featureBoundingBox          `json:"bounding_box,omitempty"`
 	Classification   *featureClassification       `json:"classification,omitempty"`
 	ImageEnhancement *featureImageEnhancement     `json:"raw_image,omitempty"`
 	InstanceSegment  *featureInstanceSegmentation `json:"instance_segment,omitempty"`
 	SemanticSegment  *featureSemanticSegment      `json:"semantic_segment,omitempty"`
+	GeneratedTokens  *[]featureGeneratedToken     `json:"generated_tokens"`
+}
+
+type featureGeneratedToken struct {
+	Index       int64   `json:"index"`
+	Token       string  `json:"label"`
+	Logits      float64 `json:"logits"`
+	Probability float64 `json:"probability"`
 }
 
 type featureBoundingBox struct {
