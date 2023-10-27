@@ -112,3 +112,7 @@ The `docker/carml-config-examle.yml` file will be copied to `.carml_config.yml` 
 that file will be mapped into the running container as a Docker volume. If you
 need to modify the configuration in any way, you should edit the `.carml_config.yml`
 file and **not** `docker/carml-config-example.yml`.
+
+### Project Wiki
+
+https://wiki.mlmodelscope.org/
