@@ -111,6 +111,34 @@ services:
       - ./docker/mlmodelscope-www.yml:/root/mlmodelscope-www.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  trace:
+    image: jaegertracing/all-in-one:1.45 
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.trace.rule=Host(`trace.${ENVIRONMENT}mlmodelscope.org`)"
+      - "traefik.http.routers.trace.entrypoints=web"
+      - "traefik.http.services.trace.loadbalancer.server.port=16686"
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9200:9200"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+
+    networks:
+      - default
+      - traefik
 ### Monitoring services
 
   grafana:
