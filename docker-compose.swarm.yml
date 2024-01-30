@@ -124,8 +124,6 @@ services:
       - "traefik.http.routers.collector.entrypoints=websecure"
       - "traefik.http.routers.collector.tls.certresolver=letsencrypt"
       - "traefik.http.services.collector.loadbalancer.server.port=4318"
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
     ports:
       - 1888:1888 # pprof extension
       - 8888:8888 # Prometheus metrics exposed by the Collector
