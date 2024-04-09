@@ -9,12 +9,12 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.${ENVIRONMENT}mlmodelscope.org`)"
+        - "traefik.http.routers.mlmodelscope-api.rule=Host(`api.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
         - "traefik.http.routers.mlmodelscope-api.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-api.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-api.loadbalancer.server.port=8080"
         - "traefik.http.middlewares.add-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT,DELETE"
-        - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.org"
+        - "traefik.http.middlewares.add-cors.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.xlabub.com"
         - "traefik.http.middlewares.add-cors.headers.accessControlAllowCredentials=true"
         - "traefik.http.middlewares.add-cors.headers.accessControlAllowHeaders=origin,x-requested-with,content-type,accept,x-request-id"
         - "traefik.http.middlewares.add-cors.headers.accesscontrolmaxage=100"
@@ -30,12 +30,12 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.${ENVIRONMENT}mlmodelscope.org`)"
+        - "traefik.http.routers.mlmodelscope-companion.rule=Host(`companion.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
         - "traefik.http.routers.mlmodelscope-companion.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-companion.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-companion.loadbalancer.server.port=3020"
         - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowMethods=GET,OPTIONS,POST"
-        - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.org"
+        - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolalloworiginlist=https://${ENVIRONMENT}mlmodelscope.xlabub.com"
         - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowCredentials=true"
         - "traefik.http.middlewares.add-cors-companion.headers.accessControlAllowHeaders=origin,content-type,accept,uppy-versions"
         - "traefik.http.middlewares.add-cors-companion.headers.accesscontrolmaxage=100"
@@ -47,7 +47,7 @@ services:
       COMPANION_AWS_SECRET: "$COMPANION_AWS_SECRET"
       COMPANION_AWS_BUCKET: "$COMPANION_AWS_BUCKET"
       COMPANION_AWS_REGION: "$COMPANION_AWS_REGION"
-      COMPANION_DOMAIN: "https://companion.${ENVIRONMENT}mlmodelscope.org"
+      COMPANION_DOMAIN: "https://companion.${ENVIRONMENT}mlmodelscope.xlabub.com"
 
     volumes:
       - staging-companion-data:/data
@@ -64,7 +64,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik"
-        - "traefik.http.routers.mlmodelscope-mq.rule=Host(`mq.${ENVIRONMENT}mlmodelscope.org`)"
+        - "traefik.http.routers.mlmodelscope-mq.rule=Host(`mq.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
         - "traefik.http.routers.mlmodelscope-mq.entrypoints=websecure"
         - "traefik.http.routers.mlmodelscope-mq.tls.certresolver=letsencrypt"
         - "traefik.http.services.mlmodelscope-mq.loadbalancer.server.port=15672"
@@ -90,15 +90,15 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.trace.rule=Host(`trace.${ENVIRONMENT}mlmodelscope.org`)"
+      - "traefik.http.routers.trace.rule=Host(`trace.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
       - "traefik.http.routers.trace.entrypoints=websecure"
       - "traefik.http.routers.trace.tls.certresolver=letsencrypt"
       - "traefik.http.services.trace.loadbalancer.server.port=16686"
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
       - COLLECTOR_OTLP_ENABLED=true
-      - COLLECTOR_OTLP_ENDPOINT=https://otel.${ENVIRONMENT}mlmodelscope.org:4318/v1/traces
-      - OTLP_EXPORTER_ENDPOINT=https://otel.${ENVIRONMENT}mlmodelscope.org:4318/v1/traces
+      - COLLECTOR_OTLP_ENDPOINT=https://otel.${ENVIRONMENT}mlmodelscope.xlabub.com:4318/v1/traces
+      - OTLP_EXPORTER_ENDPOINT=https://otel.${ENVIRONMENT}mlmodelscope.xlabub.com:4318/v1/traces
     ports:
       - "5775:5775/udp"
       - "6831:6831/udp"
@@ -120,7 +120,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.collector.rule=Host(`otel.${ENVIRONMENT}mlmodelscope.org`)"
+      - "traefik.http.routers.collector.rule=Host(`otel.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
       - "traefik.http.routers.collector.entrypoints=websecure"
       - "traefik.http.routers.collector.tls.certresolver=letsencrypt"
       - "traefik.http.services.collector.loadbalancer.server.port=4318"
@@ -152,7 +152,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik"
-        - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.org`)"
+        - "traefik.http.routers.grafana.rule=Host(`monitoring.${ENVIRONMENT}mlmodelscope.xlabub.com`)"
         - "traefik.http.routers.grafana.entrypoints=websecure"
         - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
