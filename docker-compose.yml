@@ -2,7 +2,8 @@ version: "3.8"
 services:
   api:
     image: "$DOCKER_REGISTRY/mlmodelscope-api:$API_VERSION"
-
+    ports:
+      - "8090:8080"
     environment:
       - DB_DBNAME=$DB_DBNAME
       - DB_DRIVER=$DB_DRIVER
